@@ -1,3 +1,1 @@
-
-
-void choixHash(int optionFichier, int optionDigest, char* text, char* digest) ;
+void calculHash(char* message, char* digest);

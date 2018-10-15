@@ -1,26 +1,20 @@
 CC = gcc
-CFLAGS = -Wall -c
-OFLAGS = -Wall -o
+CFLAGS = -c
+OFLAGS = -o
 LIBFLAGS = -lssl -lcrypto
 
-MAIN = main
+MAIN = main.c
 MODULE1 = module1
 MODULE2 = module2
+CMODULE = module1.c module2.c
+OMODULE = module1.o module2.o
 TARGET = hash
 
-main : $(SOURCE)
-	$(CC) $(OFLAGS) $(TARGET) $(MAIN).c
+program : $(MAIN)
+	$(CC) $(OFLAGS) $(TARGET) $(MAIN) $(OMODULE) $(LIBFLAGS)
 
-module1 : $(MODULE1).c
-	$(CC) $(CFLAGS) $(MODULE1).c $(LIBFLAGS)
-
-module2 : $(MODULE2).c
-	$(CC) $(CFLAGS) $(MODULE2).c $(LIBFLAGS)
-
-full :
-	$(CC) $(OFLAGS) $(TARGET) $(MAIN).c $(MODULE1).o $(MODULE2).o $(LIBFLAGS)
+module : $(MODULE)
+	$(CC) $(CFLAGS) $(CMODULE) $(LIBFLAGS)
 
 clean :
-	rm -i $(TARGET)
-
-crypto :
+	rm $(TARGET) $(OMODULE)

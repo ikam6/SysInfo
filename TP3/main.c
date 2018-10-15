@@ -1,32 +1,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// int main()
-// {
-// 	printf("Hello, World!\n");
-// 	return 0;
-// }
-
-
 #include "module1.h"
-#include "module2.h"
 
+int main(int argc, char *argv[]) {
+	// int option = 0;
+	// char text[] = "Hello World";
+	// char digest[] = "";
 
-#define STRING_MAX 30
+	//printf("argc %i\n", argc);
+	// for (size_t i = 0; i < argc; i++) {
+	// 	printf("argv %s\n", argv[i]);
+	// }
 
-
-int main(int argc, char const *argv[]) {
-	int optionFichier = 10;
-	int optionDigest = 21;
-	char text[] = "Hello World";
-	char digest[] = "md7";
-
-	printf("Le text est : %s\n", text);
-	printf("Le digest est : %s\n", digest);
-	printf("-f est : %i\n", optionFichier);
-	printf("-t est : %i\n", optionDigest);
-	
-	choixHash(optionFichier, optionDigest, text, digest);
+	recuperation_donnees(argc, argv);
+	//option = recuperation_donnees(argc, argv);
+	// printf("Le text est : %s\n", text);
+	// printf("Le digest est : %s\n", digest);
+	// printf("-f est : %i\n", option);
+	// choixHash(option, text, digest);
 
 	return 0;
 }

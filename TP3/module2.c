@@ -7,55 +7,28 @@
 
 
 // optionFichier : -f = 11 et rien = 10; optionDigest : -t = 21 et rien = 20
-void choixHash(int optionFichier, int optionDigest, char* text, char* digest) {
-    switch(optionFichier){
-        case 11:
-        //
-        switch(optionDigest){
-            case 21:
-            // fichier avec digest specifique
-            //char text[] = lectureFichier(fichier);
-            // FILE* fichier = NULL;
-            // char text[TAILLE_MAX] = "";
-            // fichier = fopen(fichier, "r");
-            // if (fichier != NULL){
-            //     fgets(text, TAILLE_MAX, fichier);
-            //     fclose(fichier);
-            // }
-            calculHash(text, digest);
-            break;
-            case 20:
-            // fichier avec sha1
-            //char text[] = lectureFichier(fichier);
-            // FILE* fichier = NULL;
-            // char text[TAILLE_MAX] = "";
-            // fichier = fopen(fichier, "r");
-            // if (fichier != NULL){
-            //     fgets(text, TAILLE_MAX, fichier);
-            //     fclose(fichier);
-            // }
-            calculHash(text, "sha1");
-            break;
-        }
-        break;
-        case 10:
-        //
-        switch(optionDigest){
-            case 21:
-            // string avec digest specifique
-            calculHash(text, digest);
-            break;
-            case 20:
-            // string avec sha1
-            calculHash(text, "sha1");
-            break;
-        }
-        break;
-        default :
-        printf("Il y a un problème avec votre entrez!\n");
-        break;
-    }
-}
+// option : -f et -t  = 22, -f et !t = 21, !f et -t = 12, !f et !t = 11
+// void choixHash(int option, char* text, char* digest) {
+//     switch(option){
+//         case 22:
+//         calculHash(text, digest);
+//         break;
+//         case 21:
+//         calculHash(text, "sha1");
+//         break;
+//         case 12:
+//         calculHash(text, digest);
+//         break;
+//         case 11:
+//         calculHash(text, "sha1");
+//         break;
+//         default :
+//         printf("Il doit y avoir une erreur dans votre entrée.\n");
+//         printf("Merci de relancer le programme.\n");
+//         exit(EXIT_FAILURE);
+//         break;
+//     }
+// }
 
 
 void calculHash(char* message, char* digest) {
@@ -79,7 +52,7 @@ void calculHash(char* message, char* digest) {
     EVP_DigestFinal_ex(mdctx, md_value, &md_len);
     EVP_MD_CTX_free(mdctx);
 
-    printf("Le resultat du digest est : \n");
+    printf("Le resultat pour le message %s du digest %s est : \n", message, digest);
     for (i = 0; i < md_len; i++)
     printf("%02x", md_value[i]);
     printf("\n");
