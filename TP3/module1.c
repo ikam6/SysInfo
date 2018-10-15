@@ -17,7 +17,8 @@ int recuperation_donnees(int argc, char *argv[])
     char c[]="ft:";
     char* Choix;
     int IsOptionHere = 0;
-
+    char text[STRING_MAX] = "";
+    
 
 //récuperation des options d'entrées
     while ((IsOptionHere = getopt(argc, argv, c))!= -1){
@@ -54,7 +55,7 @@ int recuperation_donnees(int argc, char *argv[])
         //printf("si f et t : %s, %s\n", argv[2], argv[4]);
         //choixHash(option, argv[2], argv[4]);
         FILE* fichier = NULL;
-        char text[STRING_MAX] = "";
+
 
 
           fichier = fopen(argv[2], "r");
@@ -72,7 +73,9 @@ int recuperation_donnees(int argc, char *argv[])
         printf("%s", text);
         calculHash(text, argv[4]);
 
+}
 
+//si on a que l'option de fichier on doit lire le fichier et faire le hash sha1
      else if (option_f == 1 && option_t == 0){
         option = 21;
         //printf("si f : %s\n", argv[2]);
