@@ -7,24 +7,26 @@
 // 	return 0;
 // }
 
-extern "C" {
-	#include "module1.h"
-	#include "module2.h"
-}
+
+#include "module1.h"
+#include "module2.h"
+
 
 #define STRING_MAX 30
 
-namespace {
-	char option = "none",
-	char text = "none";
 
-	int calcul = 0;
-}
 int main(int argc, char const *argv[]) {
-	option = recuperation_option();
-	text = recuperation_text();
+	int optionFichier = 10;
+	int optionDigest = 21;
+	char text[] = "Hello World";
+	char digest[] = "md7";
 
-	calcul = calculhash();
+	printf("Le text est : %s\n", text);
+	printf("Le digest est : %s\n", digest);
+	printf("-f est : %i\n", optionFichier);
+	printf("-t est : %i\n", optionDigest);
+	
+	choixHash(optionFichier, optionDigest, text, digest);
 
 	return 0;
 }
