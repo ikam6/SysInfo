@@ -5,4 +5,4 @@
     Smiljkovic Marko
 /--------------------------------------------------------*/
 
-int recuperation_donnees(int argc, char *argv[]);
+void recuperation_donnees(int argc, char *argv[]);

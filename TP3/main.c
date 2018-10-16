@@ -10,9 +10,9 @@
 
 #include "module1.h"
 
-int main(int argc, char *argv[]) {
+void main(int argc, char *argv[]) {
 
 	recuperation_donnees(argc, argv);
-	
-	return 0;
+
+	//return 0;
 }
