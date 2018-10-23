@@ -1,3 +1,10 @@
+/*--------------------------------------------------------/
+    Code fait par :
+    Lienhard Alexia
+    et
+    Smiljkovic Marko
+/--------------------------------------------------------*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -9,9 +16,9 @@
 
 #define STRING_MAX 1000
 
-char recuperation_options(int argc, char *argv[])
+void recuperation_donnees(int argc, char *argv[])
 {
-  //déclaration des variables
+    //déclaration des variables
     int option = 0;
     int option_f= 0;
     int option_t= 0;
@@ -26,8 +33,7 @@ char recuperation_options(int argc, char *argv[])
     int IsOptionHere = 0;
     char text[STRING_MAX] = "";
 
-
-//récuperation des options d'entrées
+    //récuperation des options d'entrées
     while ((IsOptionHere = getopt(argc, argv, c))!= -1){
         switch (IsOptionHere) {
             case 'f':
@@ -35,22 +41,17 @@ char recuperation_options(int argc, char *argv[])
             break;
             case 't':
             option_t = 3;
-
-            Choix = optarg;//récupération de l'argument de digest
-            /*if(Choix!="sha1"||"md5"){
-              printf("%s n'est pas un digest accepté\n",Choix );
-              exit(EXIT_FAILURE);*/
-
+            Choix = optarg; //récupération de l'argument de digest
             break;
-            default: /* '?' */
+            default: // si l'entree n'est pas correcte :
             fprintf(stderr, "Utilisation: %s [-f with file] string [-t with digest]\n",
             argv[0]);
             exit(EXIT_FAILURE);
         }
     }
 
-    //message d'erreur s'il n'y a pas d'arguments
-    printf("f et t : %i %i\n", option_f, option_t );
+    // message d'erreur s'il n'y a pas d'arguments :
+    // pour debog : printf("f et t : %i %i\n", option_f, option_t );
     if (argc == 1) {
         fprintf(stderr, "Utilisation: %s [-f with file] string [-t with digest]\n",
         argv[0]);
@@ -60,90 +61,92 @@ char recuperation_options(int argc, char *argv[])
      return Choix;
   }
 
+    // si on a les 2 options -f et -t :
+    if (option_f + option_t == 4){
+        //option = 22;
+        // pour debog : bon à savoir sur argv[] :
+        /*printf("argc %i\n", argc );
+        for (size_t i = 0; i < argc; i++) {
+            printf("argv[argc] %s\n", argv[i]);
+        }*/
 
-/*si on a les deux options, on doit lire le fichier
- et prendre l'argument de hash
-  */void AllOptions(int argc, char* argv[])
-  {
-    char text[STRING_MAX] = "";
-    int option = 0;
-    option =22;
-        //printf("si f et t : %s, %s\n", argv[2], argv[4]);
-        //choixHash(option, argv[2], argv[4]);
-        FILE* fichier = NULL;
-          fichier = fopen(argv[2], "r");
-          if (fichier != NULL){
-            fgets(text, STRING_MAX, fichier);
-            fclose(fichier);
-          }
-      else
-       {
-        printf("Impossible d'ouvrir le fichier %s\n", argv[2]);
-        exit(EXIT_FAILURE);
-      }
-
-        printf("%s", text);
-        calculHash(text, argv[4]);
-}
-
-void option_f_only(int argc, char* argv[]){
-//si on a que l'option de fichier on doit lire le fichier et faire le hash sha1
-        int option = 0;
-        option = 21;
-
-        //printf("si f : %s\n", argv[2]);
-        //choixHash(option, argv[2], "sha1");
-        FILE* fichier = NULL;
-        char text[STRING_MAX] = "";
-
-        fichier = fopen(argv[2], "r");
-        if (fichier != NULL){
-            fgets(text, STRING_MAX, fichier);
-            fclose(fichier);
+        // permet de recuperer tous les fichiers après -f :
+        for(i=4;i<argc;i++){
+            FILE* fichier = NULL;
+            char text[STRING_MAX] = "";
+            fichier = fopen(argv[i], "r");
+            if (fichier != NULL){
+                fgets(text, STRING_MAX, fichier);
+                fclose(fichier);
+            }
+            else {
+                printf("\nImpossible d'ouvrir le fichier %s\n", argv[i]);
+                exit(EXIT_FAILURE);
+            }
+            calculHash(text, argv[3]);
+            printf("    %s\n", argv[i]);
         }
-        else {
-            printf("Impossible d'ouvrir le fichier %s\n", argv[2]);
-            exit(EXIT_FAILURE);
-        }
-        printf("%s\n", text);
-
-        calculHash(text, "sha1");
-
-      }
-
-      void option_t_only(int argc, char* argv[]){
-
-        int i;
-        int Choix= recuperation_options(argc, argv);
-        int option = 0;
-        char *arr=malloc(1000*sizeof(char));
-        option = 12;
-
-
-        for(i=0;i<argc-1;i++){
-            strcat(arr,argv[i+1]);
-            strcat(arr," ");
-}
-        //choixHash(option, argv[1], argv[3]);
-        calculHash(arr, Choix);
-}
-
-
-
-void No_option(int argc, char* argv[]){
-      int option = 0;
-      int i;
-      char *arr=malloc(1000*sizeof(char));
-        option = 11;
-
-    for(i=0;i<argc-1;i++){
-        strcat(arr,argv[i+1]);
-        strcat(arr," ");
-
-
     }
 
-          calculHash(arr, "sha1");
-          free(arr);
+    //si on a que l'option de fichier -f :
+    else if (option_f + option_t == 1){
+        //option = 21;
+        // permet de recuperer tous les fichiers après -f :
+        for(i=2;i<argc;i++){
+            FILE* fichier = NULL;
+            char text[STRING_MAX] = "";
+            fichier = fopen(argv[i], "r");
+            if (fichier != NULL){
+                fgets(text, STRING_MAX, fichier);
+                fclose(fichier);
+            }
+            else {
+                printf("\nImpossible d'ouvrir le fichier %s\n", argv[i]);
+                exit(EXIT_FAILURE);
+            }
+            calculHash(text, "sha1");
+            printf("    %s\n", argv[i]);
+        }
+    }
 
+    // si on a que l'option de digest -t :
+    else if (option_f + option_t == 3){
+        //option = 12;
+        // pour debog : bon à savoir sur argv[] :
+        /*printf("argc %i\n", argc );
+        for (size_t i = 0; i < argc; i++) {
+            printf("argv[argc] %s\n", argv[i]);
+        }*/
+
+        // pour recuperer tout le message :
+        for(i=3;i<argc;i++){
+            strcat(arr,argv[i]);
+            strcat(arr," ");
+        }
+        //pour debog : printf("%s\n",arr);
+        calculHash(arr, argv[2]);
+        printf("\n");
+        free(arr);
+    }
+
+    // si on a aucune option :
+    else if (option_f + option_t == 0){
+        //option = 11;
+
+        // pour recuperer tout le message :
+        for(i=1;i<argc;i++){
+            strcat(arr,argv[i]);
+            strcat(arr," ");
+        }
+        //printf("%s\n",arr);
+        calculHash(arr, "sha1");
+        printf("\n");
+        free(arr);
+    }
+
+    // par defaut (inutile)
+    else {
+        option = 0;
+    }
+    //return option;
 }
