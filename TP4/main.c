@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <string.h>  //snprintf
 #include <errno.h>
 #include <dirent.h>
@@ -59,6 +60,7 @@ static void list_dir (const char * dir_name){
     }
   }
 
+
   static void copy_dir (const char *dir_in, const char *dir_out){
     DIR *d_in = opendir(dir_in);
     DIR *d_out = opendir(dir_out);
@@ -75,14 +77,18 @@ static void list_dir (const char * dir_name){
     if (! d_out) {
       printf("On va creer un dossier ... \n");
       d_out = mkdir(dir_out, 0777);
+
+
       if (d_out < 0) {
         int savedError = errno;
         closedir(d_in);
         fprintf(stderr, "Could not open the file %s: %s\n", dir_out, strerror(savedError));
       }
     }
-  }
 
+
+
+}
   int main (int argc, char *argv[]) {
     // list_dir(argv[1]);
     copy_dir(argv[1], argv[2]);
