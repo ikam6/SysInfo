@@ -158,7 +158,7 @@ static void list_dir (const char * dir_name){
 
 }
   int main (int argc, char *argv[]) {
-    // list_dir(argv[1]);
+    list_dir(argv[1]);
     copy_dir(argv[1], argv[2]);
     return EXIT_SUCCESS;
   }
