@@ -9,6 +9,74 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+
+#define MAX_SIZE 80
+
+int IsADirectory ( const char* name)//test si c'est un repertoire
+{
+  DIR* directory= opendir(name);
+
+  if(directory!= NULL)//c'est un repertoire
+  {
+    closedir(directory);
+    return 0 ;
+  }
+
+  if(errno==ENOTDIR)//Erreur, ce n'est pas un repertoire
+  {
+    return 1;
+  }
+
+  return -1;//autre erreur
+}
+
+
+int printInfo (int argc, char *argv[])//affiche les données
+{
+
+  char t[ 100 ] = "";
+  struct stat fileStat;
+
+
+    if(stat(argv[1],&fileStat) < 0)
+        return 1;
+
+    printf("Information for %s\n",argv[1]);
+
+
+    if ((S_ISDIR(fileStat.st_mode))== 0)
+    {
+      if (S_ISLNK(fileStat.st_mode)==0)
+      {
+        printf("-");
+      }
+      else  printf("l");
+    }
+    else  printf("d");
+
+//affichage des infos de lecture/écriture
+    printf( (fileStat.st_mode & S_IRUSR) ? "r" : "-");
+    printf( (fileStat.st_mode & S_IWUSR) ? "w" : "-");
+    printf( (fileStat.st_mode & S_IXUSR) ? "x" : "-");
+    printf( (fileStat.st_mode & S_IRGRP) ? "r" : "-");
+    printf( (fileStat.st_mode & S_IWGRP) ? "w" : "-");
+    printf( (fileStat.st_mode & S_IXGRP) ? "x" : "-");
+    printf( (fileStat.st_mode & S_IROTH) ? "r" : "-");
+    printf( (fileStat.st_mode & S_IWOTH) ? "w" : "-");
+    printf( (fileStat.st_mode & S_IXOTH) ? "x" : "-");
+
+    printf(" %ld",sizeof(fileStat));
+//affichage jour /mois /heure / année de modification
+  if (!stat(argv[1], &fileStat)) {
+    strftime(t, 100, " %a %b %d %T %Y  ",
+            localtime( &fileStat.st_mtime));
+            printf(" %s", t);
+  }
+   else {
+  printf("-----------------");
+  }
+  printf(" %s\n",argv[1]);
+}
 static void list_dir (const char * dir_name){
 
   DIR *d = opendir(dir_name);
@@ -75,9 +143,9 @@ static void list_dir (const char * dir_name){
     }
 
     if (! d_out) {
+
       printf("On va creer un dossier ... \n");
       d_out = mkdir(dir_out, 0777);
-
 
       if (d_out < 0) {
         int savedError = errno;
