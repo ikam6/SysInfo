@@ -8,7 +8,7 @@
 CC = gcc
 CFLAGS = -c # -Wall avant le -c (pour voir tous les warnings)
 OFLAGS = -o # -Wall avant le -c (pour voir tous les warnings)
-LIBFLAGS = -lssl -lcrypto
+# LIBFLAGS = -lssl -lcrypto
 
 MAIN = main.c
 # CMODULE = module1.c module2.c
@@ -24,4 +24,4 @@ program : $(MAIN)
 # 	$(CC) $(CFLAGS) $(CMODULE) $(LIBFLAGS)
 
 clean :
-	rm $(TARGET) $(OMODULE)
+	rm $(TARGET)
