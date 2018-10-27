@@ -4,10 +4,30 @@
 #include <sys/stat.h>
 #include <string.h>  //snprintf
 #include <errno.h>
+#include <dirent.h>
 #include <unistd.h>
 #include <time.h>
 
 #define MAX_SIZE 100
+
+
+int IsADirectory ( const char* name)//test si c'est un repertoire
+{
+		DIR* directory= opendir(name);
+
+		if(directory!= NULL)//c'est un repertoire
+		{
+				closedir(directory);
+				return 0 ;
+		}
+
+		if(errno==ENOTDIR)//Erreur, ce n'est pas un repertoire
+		{
+				return 1;
+		}
+
+		return -1;//autre erreur
+}
 
 /////////////////////////////////////////////////////////////
 // FUNCTION formatDate
