@@ -1,14 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <string.h>  //snprintf
 #include <errno.h>
-#include <dirent.h>
-#include <limits.h>  //PATH_MAX
-#include <fcntl.h>
-#include <unistd.h>
-
 
 #include "listDir.h"
 #include "PrintInfo.h"
