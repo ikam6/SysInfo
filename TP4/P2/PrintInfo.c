@@ -11,23 +11,7 @@
 #define MAX_SIZE 100
 
 
-int IsADirectory ( const char* name)//test si c'est un repertoire
-{
-		DIR* directory= opendir(name);
 
-		if(directory!= NULL)//c'est un repertoire
-		{
-				closedir(directory);
-				return 0 ;
-		}
-
-		if(errno==ENOTDIR)//Erreur, ce n'est pas un repertoire
-		{
-				return 1;
-		}
-
-		return -1;//autre erreur
-}
 
 /////////////////////////////////////////////////////////////
 // FUNCTION formatDate
@@ -47,14 +31,19 @@ int printInfo(const char *nameDir, const char *nameFile)//affiche les données
 
     char t[MAX_SIZE] = "";
     struct stat fileStat;
-    // printf("1. %s\n", nameDir);
-    // printf("2. %s\n", nameFile);
+
 
     char strDir[MAX_SIZE]="";
-    strcat(strDir, nameDir);
-    strcat(strDir, "/"); // a faire attention selon l'entrée sur le terminal !! (risque de double //)
-    strcat(strDir, nameFile);
-    strcpy(t, strDir); //utile pour afficher le temps
+		if (nameDir!=nameFile){
+			strcat(strDir, nameDir);
+	    strcat(strDir, "/"); // a faire attention selon l'entrée sur le terminal !! (risque de double //)
+	    strcat(strDir, nameFile);
+	    strcpy(t, strDir);
+		}
+		if(nameDir==nameFile){
+			strcat(strDir,nameFile);
+		}
+     //utile pour afficher le temps
     //printf("\nstringDir : %s\n", strDir);
 
 
@@ -89,42 +78,5 @@ int printInfo(const char *nameDir, const char *nameFile)//affiche les données
     printf(" %6ld",fileStat.st_size);
     printf(" %s", formatDate(t, fileStat.st_mtime)); //
     printf(" %s\n", strDir);
-}
 
-
-int printInfoFile(const char *filename){
-	struct stat fileStat;
-	char t[MAX_SIZE] = "";
-	strcpy(t, filename);
-	if(stat(filename, &fileStat) <0 ){
-			fprintf(stderr, "Cannot stat %s : %s\n", filename, strerror(errno) );
-	}else  {
-			//printf("File inode: %ld\n", fileStat.st_ino);
-	}
-
-
-	if ((S_ISDIR(fileStat.st_mode))== 0)
-	{
-			if (S_ISLNK(fileStat.st_mode)==0)
-			{
-					printf("-");
-			}
-			else  printf("l");
-	}
-	else  printf("d");
-
-	//affichage des infos de lecture/écriture
-	printf( (fileStat.st_mode & S_IRUSR) ? "r" : "-");
-	printf( (fileStat.st_mode & S_IWUSR) ? "w" : "-");
-	printf( (fileStat.st_mode & S_IXUSR) ? "x" : "-");
-	printf( (fileStat.st_mode & S_IRGRP) ? "r" : "-");
-	printf( (fileStat.st_mode & S_IWGRP) ? "w" : "-");
-	printf( (fileStat.st_mode & S_IXGRP) ? "x" : "-");
-	printf( (fileStat.st_mode & S_IROTH) ? "r" : "-");
-	printf( (fileStat.st_mode & S_IWOTH) ? "w" : "-");
-	printf( (fileStat.st_mode & S_IXOTH) ? "x" : "-");
-
-	printf(" %6ld",fileStat.st_size);
-	printf(" %s", formatDate(t, fileStat.st_mtime)); //
-	printf(" %s\n", filename);
 }

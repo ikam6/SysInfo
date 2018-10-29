@@ -11,8 +11,8 @@ OFLAGS = -o # -Wall avant le -c (pour voir tous les warnings)
 # LIBFLAGS = -lssl -lcrypto
 
 MAIN = main.c
-CMODULE = listDir.c PrintInfo.c copyDir.c
-OMODULE = listDir.o PrintInfo.o copyDir.o
+CMODULE = list.c PrintInfo.c copyDir.c
+OMODULE = list.o PrintInfo.o copyDir.o
 TARGET = ultra-cp
 
 #program : $(MAIN)

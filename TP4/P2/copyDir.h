@@ -1,1 +1,1 @@
-void copyDir (const char *dir_in, const char *dir_out);
+ int copy(const char *from, const char *to);
