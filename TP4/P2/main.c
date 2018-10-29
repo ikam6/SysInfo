@@ -14,8 +14,7 @@
 /*////////////////////////////////////////////////////////////
  FUNCTION main
 ////////////////////////////////////////////////////////////*/
-
-	int main (int argc, char *argv[]) {
+int main (int argc, char* argv[]){
 		int i;
 		if (argc == 2) { //si une entrée-> afficher infos
 			list(argv[1]);
