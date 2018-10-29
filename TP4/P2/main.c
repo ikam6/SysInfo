@@ -4,7 +4,7 @@
 
 #include "listDir.h"
 #include "PrintInfo.h"
-#include "copyDir.c"
+#include "copyDir.h"
 
 #define MAX_SIZE 100
 #define ONE_FILE 2
@@ -44,4 +44,5 @@
 	    }
 
 	    return EXIT_SUCCESS;
+}
 }

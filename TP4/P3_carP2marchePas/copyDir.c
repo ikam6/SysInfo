@@ -58,6 +58,17 @@ int copy(const char *from, const char *to) {
 
   close( fd_from );
   close( fd_to );
+
+	    if( close(fd_from) ) {
+	        fprintf(stderr, "Could not close '%s': %s\n",
+	        fd_from, strerror (errno));
+	        exit (EXIT_FAILURE);
+				}
+
+		 if( close(fd_to) ) {
+        fprintf(stderr, "Could not close '%s': %s\n",
+				        fd_to, strerror (errno));
+				        exit (EXIT_FAILURE);
   //Il faudrait gérer les erreurs de fermeture
 
   return 0;

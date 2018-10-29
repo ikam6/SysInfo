@@ -1,4 +1,13 @@
-
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <string.h>  //snprintf
+#include <errno.h>
+#include <dirent.h>
+#include <unistd.h>
+#include <time.h>
+#include <fcntl.h>
 /////////////////////////////////////////////////////////////
 // FUNCTION copyDir
 /////////////////////////////////////////////////////////////
@@ -133,3 +142,4 @@ void copyDir (const char *dir_in, const char *dir_out){
         dir_in, strerror (errno));
         exit (EXIT_FAILURE);
     }
+	}

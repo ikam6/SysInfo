@@ -11,9 +11,9 @@ CFLAGS = -c # -Wall avant le -c (pour voir tous les warnings)
 OFLAGS = -o # -Wall avant le -o (pour voir tous les warnings)
 
 MAIN = main.c
-CMODULE = listDir.c PrintInfo.c
-OMODULE = listDir.o PrintInfo.o
-HMODULE = listDir.h PrintInfo.h
+CMODULE = list.c PrintInfo.c
+OMODULE = list.o PrintInfo.o
+HMODULE = list.h PrintInfo.h
 TARGET = ultra-cp
 
 
