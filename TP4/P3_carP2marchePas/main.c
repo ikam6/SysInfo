@@ -4,6 +4,7 @@
 
 #include "listDir.h"
 #include "PrintInfo.h"
+#include "copyDir.h"
 
 #define MAX_SIZE 100
 
@@ -24,6 +25,11 @@ int main (int argc, char *argv[]) {
 		}
 		else {
 			perror(NULL);
+		}
+	}
+	else if (argc > 2) {
+		for (int i = 1; i < argc-1; i++) {
+			copy(argv[i], argv[argc-1]);
 		}
 	}
 
