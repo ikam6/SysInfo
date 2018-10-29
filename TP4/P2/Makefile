@@ -7,21 +7,24 @@
 
 CC = gcc
 CFLAGS = -c # -Wall avant le -c (pour voir tous les warnings)
-OFLAGS = -o # -Wall avant le -c (pour voir tous les warnings)
-# LIBFLAGS = -lssl -lcrypto
+
+OFLAGS = -o # -Wall avant le -o (pour voir tous les warnings)
 
 MAIN = main.c
 CMODULE = list.c PrintInfo.c copyDir.c
 OMODULE = list.o PrintInfo.o copyDir.o
+HMODULE = list.h PrintInfo.h copyDir.h
 TARGET = ultra-cp
 
-#program : $(MAIN)
-	#$(CC) $(OFLAGS) $(TARGET) $(MAIN)
-program : $(MAIN) $(OMODULE)
-	$(CC) $(OFLAGS) $(TARGET) $(MAIN) $(OMODULE)
 
-module : $(CMODULE)
+program : $(OMODULE) main.o
+	$(CC) $(OMODULE) main.o $(OFLAGS) $(TARGET)
+
+main.o : $(MAIN) $(HMODULE)
+	$(CC) $(CFLAGS) $(MAIN) $(OFLAGS) main.o
+
+$(OMODULE) : $(CMODULE)
 	$(CC) $(CFLAGS) $(CMODULE)
 
 clean :
-	rm $(TARGET) $(OMODULE)
+	rm $(TARGET) *.o
