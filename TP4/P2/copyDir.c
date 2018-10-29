@@ -1,3 +1,9 @@
+/*--------------------------------------------------------/
+     Code fait par :
+     Lienhard Alexia
+     et
+     Smiljkovic Marko
+/--------------------------------------------------------*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

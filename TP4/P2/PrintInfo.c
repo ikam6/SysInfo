@@ -1,3 +1,9 @@
+/*--------------------------------------------------------/
+     Code fait par :
+     Lienhard Alexia
+     et
+     Smiljkovic Marko
+/--------------------------------------------------------*/
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/types.h>

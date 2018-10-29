@@ -1,4 +1,7 @@
-int IsADirectory ( const char* name);
-char *formatDate(char *message, time_t val);
+/*--------------------------------------------------------/
+     Code fait par :
+     Lienhard Alexia
+     et
+     Smiljkovic Marko
+/--------------------------------------------------------*/
 int printInfo(const char *nameDir, const char *nameFile);
-int printInfoFile(const char *filename);
