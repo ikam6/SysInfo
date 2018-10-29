@@ -28,16 +28,3 @@ $(OMODULE) : $(CMODULE)
 
 clean :
 	rm $(TARGET) *.o
-pour recuperer tout les dossiers/fichiers sauf le dernier
-		// qui sera le repertoire destination
-		for(int i=1;i<argc-1;i++){
-			// printf("%i :: %s\n", i, argv[i]);
-			copy(argv[i], argv[argc-1]);
-			//printInfo(argv[i], argv[argc-1]);
-
-			// printf("Rappel pour l'entrée : ./ultra-cp dossier ou fichier \n");
-			//exit(EXIT_FAILURE);
-		}
-	}
-	return EXIT_SUCCESS;
-}
