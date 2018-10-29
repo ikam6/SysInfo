@@ -75,7 +75,7 @@ int printInfo(const char *nameDir, const char *nameFile)//affiche les données
     printf( (fileStat.st_mode & S_IWOTH) ? "w" : "-");
     printf( (fileStat.st_mode & S_IXOTH) ? "x" : "-");
 
-    printf(" %6ld",fileStat.st_size);
+    printf(" %8ld",fileStat.st_size);
     printf(" %s", formatDate(t, fileStat.st_mtime)); //
     printf(" %s\n", strDir);
 

@@ -6,9 +6,11 @@
 #include <errno.h>
 #include <dirent.h>
 #include <limits.h>  //PATH_MAX
-#include <libgen.h>//basename
+#include <libgen.h> //basename
 #include <sys/types.h>
 #include <sys/stat.h>
+
+#include "PrintInfo.h"
 
 #define MAX_BUF 4096
 #define PATH_MAX 4096
@@ -68,102 +70,153 @@ void copy(const char *from, const char *to) {
     close( fd_to );
     //Il faudrait gérer les erreurs de fermeture
 
-    if( close( fd_from ) ) {
-        fprintf(stderr, "Could not close '%s': %s\n",
-        from, strerror (errno));
-        exit (EXIT_FAILURE);
-    }
-
-    if( close( fd_to ) ) {
-        fprintf(stderr, "Could not close '%s': %s\n",
-        to, strerror (errno));
-        exit (EXIT_FAILURE);
-    }
-
-    // if( (errno = close(fd_from)) != 0 ) {
-    //     fprintf(stderr, "Could not close '%s': %s\n",
-    //     fd_from, strerror (errno));
+    // if( close( fd_from ) ) {
+    //     fprintf(stderr, "Could not close file from '%s': %s\n",
+    //     from, strerror (errno));
     //     exit (EXIT_FAILURE);
     // }
     //
-    // if( (errno = close(fd_to)) != 0 ) {
-    //     fprintf(stderr, "Could not close '%s': %s\n",
-    //     fd_to, strerror (errno));
+    // if( close( fd_to ) ) {
+    //     fprintf(stderr, "Could not close file to '%s': %s\n",
+    //     to, strerror (errno));
     //     exit (EXIT_FAILURE);
     // }
+
 }
 
-void copying_rec(const char *dirFrom, const char *dirTo) {
+void copying_rec(char *dirFrom, char *dirTo) {
 
-    DIR *pathFrom = opendir(dirFrom);
-    DIR *pathTo = opendir(dirTo);
-    struct dirent *entry;
-    const char *d_name;   //nom d'une entrée
+    struct stat infoFile;
 
-    //En cas d'erreur d'ouverture
-    if (! pathFrom) {
+    char *directory = dirTo;
+    stat(directory, &infoFile);
 
-        fprintf(stderr, "Cannot open directory '%s': %s\n",
-        dirFrom, strerror(errno));
+    if (S_ISREG(infoFile.st_mode) || S_ISLNK(infoFile.st_mode)) {
+        printf("Last entry most be a directory and not %s\n", dirTo);
         exit(EXIT_FAILURE);
     }
-
-    if (! pathTo) {
-        printf("On va creer le dossier : %s\n", dirTo);
-        mkdir(dirTo, 0777);
-
-        if (pathTo < 0 ) {
-            int savedError = errno;
-            closedir(pathFrom);
-            fprintf(stderr, "Could not open directory %s: %s\n",
-            dirTo, strerror(savedError));
+    else {
+        DIR *d = opendir(dirTo);
+        if (! d){
+            //printf("On va creer le dossier '%s' : \n", dirTo);
+            mkdir(dirTo, 0777);
         }
+        // else{
+        //     printf("Le dossier '%s', existe deja.\n", dirTo);
+        // }
     }
 
-    //Boucle sur chaque entrée
-    while( (entry = readdir(pathFrom)) != NULL ) {
-        // Obtient le nom de l'entrée et affiche
-        d_name = entry->d_name;
+    char *filename = dirFrom;
+    stat(filename, &infoFile);
 
-        if (strcmp(d_name, "..") != 0 && strcmp(d_name, ".") != 0) {
-            printf("d_name %s\n", d_name);
+    if (S_ISREG(infoFile.st_mode) || S_ISLNK(infoFile.st_mode)) {
+        filename = basename(dirFrom);
+        printf("filename %s\n", filename);
+        printf("dirTo %s\n", dirTo);
+
+        // char outFrom[MAX_BUF] = "";
+        // strcat(outFrom, dirFrom);
+        // strcat(outFrom, "/");
+        // strcat(outFrom, filename);
+
+        char outTo[MAX_BUF] = "";
+        strcat(outTo, dirTo);
+        strcat(outTo, "/");
+        strcat(outTo, filename);
+        //printf("outTo %s\n", outTo);
+
+        copy(filename, outTo);
+    }
+    else if (S_ISDIR(infoFile.st_mode)) {
+        DIR *d = opendir(dirFrom);
+        struct dirent *entry;
+        const char *d_name;
+
+        if (!d) {
+            fprintf(stderr, "Cannot open directory '%s' : %s\n",
+            dirFrom, strerror(errno));
+            exit(EXIT_FAILURE);
         }
 
-        //Est-ce que 'entry' est un sous-répertoire
-        if (entry->d_type & DT_DIR) {
-            //Est-ce que 'entry' n'est pas '..' ou '.'
-            if (strcmp(d_name, "..") != 0 && strcmp(d_name, ".") != 0) {
-                char path[PATH_MAX];
-                //forme le nom du sous-répertoire et affiche
-                int path_length = snprintf (path, PATH_MAX, "%s/%s",
-                dirTo, d_name);
-                //printf("Dans la question if : %s\n", path);
-                //Vérifie que le nom du sous-répertoire n'est pas trop long
-                if (path_length >= PATH_MAX) {
-                    fprintf(stderr, "Path length has got too long.\n");
-                    exit(EXIT_FAILURE);
-                }
+        char outFrom[MAX_BUF] = "";
+        strcat(outFrom, dirFrom);
 
-                //Appel récursif
-                printf("dirFrom %s, dirTo %s, d_name %s\n", dirFrom, dirTo, d_name);
-                copying_rec(dirFrom, dirTo);
+        char outTo[MAX_BUF] = "";
+        strcat(outTo, dirTo);
+
+        //printf("outTo avant mkdir %s\n", outTo);
+        mkdir(outTo, 0777);
+
+        while ( (entry = readdir(d)) != NULL ) {
+            d_name = entry -> d_name;
+
+            if ((strcmp(d_name, "..") == 0) || (strcmp(d_name, ".") == 0)) {
+                continue;
+            }
+
+            if ((entry->d_type & DT_REG) || (entry->d_type & DT_LNK)) {
+                strcat(outFrom, "/");
+                strcat(outFrom, d_name);
+
+                // pour pouvoir faire l'affichage creer tmp:
+                char tmp[MAX_BUF] = "";
+                strcpy(tmp, outTo);
+
+                strcat(outTo, "/");
+                strcat(outTo, d_name);
+
+                // printf("outFrom %s\n", outFrom);
+                // printf("outTo %s\n", outTo);
+
+                copy(outFrom, outTo);
+
+                //printf("tmp : %s, d-name : %s\n", tmp, d_name);
+                printInfo(tmp, d_name);
+
+
+                strcpy(outFrom, dirFrom);
+                strcpy(outTo, dirTo);
+
+            }
+
+            //Sous-repertoire :
+            if (entry->d_type & DT_DIR) {
+                if (strcmp(d_name, "..") != 0 && strcmp(d_name, ".") != 0) {
+
+                    char path[MAX_BUF] = "";
+
+                    //forme le nom du sous-répertoire et affiche
+                    int path_length = snprintf (path, PATH_MAX, "%s/%s", dirFrom, d_name);
+                    //printf("path name : %s\n", path);
+
+                    //verifie que le nom du sous-répertoire n'est pas trop long
+                    if (path_length >= PATH_MAX) {
+                        fprintf(stderr, "Path length has got too long.\n");
+                        exit(EXIT_FAILURE);
+                    }
+
+                    // pour pouvoir faire l'affichage creer tmp:
+                    char tmp2[MAX_BUF] = "";
+                    strcpy(tmp2, outTo);
+
+                    strcat(outTo, "/");
+                    strcat(outTo, d_name);
+
+                    //printf("path : %s, dirTo : %s, outTo %s,\n tmp2 %s, d_name %s\n",
+                    //path, dirTo, outTo, tmp2, d_name);
+
+
+                    //appel rec
+                    copying_rec(path, outTo);
+                    printInfo(tmp2, d_name);
+                }
             }
         }
-    } //while(1)
-    //On ferme le répertoite
-    printf("On arrive a la fin \n" );
-    closedir( pathFrom );
-    closedir( pathTo );
 
-    if( closedir( pathFrom ) ) {
-        fprintf(stderr, "Could not close '%s': %s\n",
-        dirFrom, strerror (errno));
-        exit (EXIT_FAILURE);
-    }
-
-    if( closedir( pathTo ) ) {
-        fprintf(stderr, "Could not close '%s': %s\n",
-        dirTo, strerror (errno));
-        exit (EXIT_FAILURE);
+        if (closedir(d)) {
+            fprintf(stderr, "Could not close '%s': %s\n",
+            d_name, strerror (errno));
+            exit (EXIT_FAILURE);
+        }
     }
 }

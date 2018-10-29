@@ -36,7 +36,7 @@ void list (const char *dirName){
 				char*file_name= basename(f_name);
 
 				printInfo(dirName, dirName);
-				exit(EXIT_SUCCESS);
+				//exit(EXIT_SUCCESS);
 
     }
 
