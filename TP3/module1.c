@@ -24,7 +24,7 @@ void recuperation_donnees(int argc, char *argv[])
     int option_t= 0;
     char* Choix;
     int options;
-    char c[]="ft:";
+    char c[]="ft";
 
     int *sizeofchain=NULL;
 
