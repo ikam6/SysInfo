@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <unistd.h>
-#define BUFF_SIZE 32
+#define BUFF_SIZE 2
 
 void die(char *issue) {
   perror(issue);
@@ -15,7 +15,8 @@ int copy(int from, int to) {
   ssize_t nread;
 
   while( nread = read(from, buf, sizeof buf), nread > 0 ) {
-    char *out_ptr = buf;
+		
+		char *out_ptr = buf;
     ssize_t nwritten;
     do {
       nwritten = write(to, out_ptr, nread);

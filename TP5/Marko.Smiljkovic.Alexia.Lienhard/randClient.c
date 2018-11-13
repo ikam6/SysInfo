@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
 
   /* Envoie de la requête */
 
-  if( write(sock,&numBytes,sizeof(numBytes)) < sizeof(numBytes) ) {
+  if(write(sock,&numBytes,sizeof(numBytes)) < sizeof(numBytes) ) {
     die( "Cannot send the filename to retrieve" );
   }
 
@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
   data = (char*) malloc( numBytes );
 
   while( rcvd < numBytes ) {
-    n = read( sock, data+rcvd, numBytes-rcvd );
+    n = read(sock, data+rcvd, numBytes-rcvd);
     if( n  < 0 ) {
       die( "Cannot receive data" );
     }
@@ -80,13 +80,13 @@ int main(int argc, char *argv[]) {
 
   /* Décommenter pour afficher le résultats en hexadecimal */
 
-  /*
+
   printf( "Received: " );
   for( int i=0; i < numBytes; i++ ) {
-    printf("%x", data[i] & 0xff );
+    printf("%x ", data[i] & 0xff );
   }
   printf("\n");
-  */
+
 
   /* Libération des resources */
   free( data );
