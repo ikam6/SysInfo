@@ -42,20 +42,9 @@ Voilà votre mail est envoyé.
 #define h_addr h_addr_list[0]
 #define STRING_MAX 10000
 
-// Initialisation
-struct sockaddr_in server;
-struct hostent *hp;
-struct hostent *gethostbyname();
 
 
-char *host_id="smtp.unige.ch";
-
-//TODO : changer le nom envoyeur, recepteur et sujet du mail ici :
-char *from_id = "marko.smiljkovic@etu.unige.ch";
-char *to_id = "marko.smiljkovic@etu.unige.ch";
-char *sub = "testmail\r\n";
-
-char wkstr[STRING_MAX]="";
+char filestr[STRING_MAX]="";
 
 int sock;
 
@@ -94,22 +83,30 @@ void send_socket(char *s)	{
 /*=====READ FILE======*/
 void readfile(int argc, char *argv[]) {
 	FILE *fichier = NULL;
+	char ch;
 	fichier = fopen(argv[1], "r");
-
 	if(fichier != NULL) {
-        fgets(wkstr, STRING_MAX, fichier);
+		ch = fgetc(fichier);
+		int len = 0;
+		while (ch != EOF && ch != '\0') {
+			filestr[len]=ch;
+			len++;
+			ch = fgetc(fichier);
+			//printf("%c\n", ch);
+		}
+        //puts(wkstr);
 		fclose(fichier);
 	}
 	else {
 		perror("Erreur lors de l'ouverture du fichier.\n");
 		exit(EXIT_FAILURE);
 	}
-	strcat(wkstr, "\r\n");
+	strcat(filestr, "\r\n");
 }
 
 
 /*==== SEND A MAIL =====*/
-void SendEmail(char* from_id, char* to_id, char* sub, char* wkstr ){
+void SendEmail(char* from_id, char* to_id, char* sub, char* filestr ){
 	/*=====Write some data then read some =====*/
 	read_socket(); /* SMTP Server logon string */
 	send_socket(HELO); /* introduce ourselves */
@@ -130,19 +127,29 @@ void SendEmail(char* from_id, char* to_id, char* sub, char* wkstr ){
 	send_socket("Subject: ");
 	send_socket(sub);
 	read_socket(sock); // Recipient OK*/
-	send_socket(wkstr);
+	send_socket(filestr);
 	send_socket(".\r\n");
 	read_socket();
 	send_socket(QUIT); /* quit */
 	read_socket(); // log off */
-
-	//=====Close socket and finish=====*/
-	close(sock);
-	exit(0);
 }
 
 /*=====MAIN=====*/
 int main(int argc, char* argv[]){
+	// Initialisation
+	struct sockaddr_in server;
+	struct hostent *hp;
+	struct hostent *gethostbyname();
+
+
+	char *host_id="smtp.unige.ch";
+
+	//TODO : changer le nom envoyeur, recepteur et sujet du mail ici :
+	char *from_id = "marko.smiljkovic@etu.unige.ch";
+	char *to_id = "marko.smiljkovic@etu.unige.ch";
+	char *sub = "testmail\r\n";
+
+	// Controle de l'entree utilisateur :
 	if (argc != 2){
 		printf("Rappel d'exécution : %s 'fichier.txt' \n", argv[0]);
 		exit(EXIT_FAILURE);
@@ -179,7 +186,11 @@ int main(int argc, char* argv[]){
 	/*===== READ FILE ======*/
 	readfile(argc, argv);
 
-	//printf("\n\n wkstr : %s\n\n", wkstr);
+	//printf("\n\n filestr : %s\n\n", filestr);
 
-	SendEmail(from_id, to_id, sub, wkstr);
+	SendEmail(from_id, to_id, sub, filestr);
+
+	//=====Close socket and finish=====*/
+	close(sock);
+	exit(0);
 }
