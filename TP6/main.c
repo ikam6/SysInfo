@@ -145,7 +145,7 @@ int main(int argc, char* argv[]){
 	//TODO : changer le nom envoyeur, recepteur et sujet du mail ici :
 	char *from_id = "marko.smiljkovic@etu.unige.ch";
 	char *to_id = "marko.smiljkovic@etu.unige.ch";
-	char *sub = "testmail\r\n";
+	char *sub = "Test pour le TP6\r\n";
 
 	// Controle de l'entree utilisateur :
 	if (argc != 2){
@@ -176,7 +176,6 @@ int main(int argc, char* argv[]){
 
 	/*===== READ FILE ======*/
 	char *message = readfile(argv);
-
 	//printf("\n\n filestr : %s\n\n", message);
 	SendEmail(sock, from_id, to_id, sub, message);
 
