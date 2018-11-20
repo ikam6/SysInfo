@@ -43,28 +43,27 @@ Voilà votre mail est envoyé.
 #define STRING_MAX 10000
 
 
-
+// variable globable pour permettre un echange plus facile entre les fonctions
+// car on n'arrive pas a sortir un string de void readfile():
 char filestr[STRING_MAX]="";
-
-int sock;
 
 
 /*=====Create Socket=====*/
 int createSocket(){
-	sock = socket(AF_INET, SOCK_STREAM, 0);
+	int sock = socket(AF_INET, SOCK_STREAM, 0);
 
 	if (sock==-1)	{
 		perror("opening stream socket");
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 	else {
-        printf( "socket created\n");
+        printf("Trying %s", HELO);
     }
 	return sock;
 }
 
 //=====Read a string from the socket=====*/
-void read_socket() {
+void read_socket(int sock) {
 	char buf[BUFSIZ+1];
 	int len;
 
@@ -74,7 +73,7 @@ void read_socket() {
 }
 
 /*=====Send a string to the socket=====*/
-void send_socket(char *s)	{
+void send_socket(int sock, char *s)	{
 	write(sock,s,strlen(s));
 	write(1,s,strlen(s));
 	//printf("Client:%s\n",s);
@@ -106,32 +105,32 @@ void readfile(int argc, char *argv[]) {
 
 
 /*==== SEND A MAIL =====*/
-void SendEmail(char* from_id, char* to_id, char* sub, char* filestr ){
+void SendEmail(int sock, char* from_id, char* to_id, char* sub, char* filestr ){
 	/*=====Write some data then read some =====*/
-	read_socket(); /* SMTP Server logon string */
-	send_socket(HELO); /* introduce ourselves */
-	read_socket(); /*Read reply */
-	send_socket("MAIL FROM: ");
-	send_socket(from_id);
-	send_socket("\r\n");
-	read_socket(); /* Sender OK */
-	send_socket("VRFY ");
-	send_socket(from_id);
-	send_socket("\r\n");
-	read_socket(); // Sender OK */
-	send_socket("RCPT TO: "); /*Mail to*/
-	send_socket(to_id);
-	send_socket("\r\n");
-	read_socket(); // Recipient OK*/
-	send_socket(DATA);// body to follow*/
-	send_socket("Subject: ");
-	send_socket(sub);
+	read_socket(sock); /* SMTP Server logon string */
+	send_socket(sock, HELO); /* introduce ourselves */
+	read_socket(sock); /*Read reply */
+	send_socket(sock, "MAIL FROM: ");
+	send_socket(sock, from_id);
+	send_socket(sock, "\r\n");
+	read_socket(sock); /* Sender OK */
+	send_socket(sock, "VRFY ");
+	send_socket(sock, from_id);
+	send_socket(sock, "\r\n");
+	read_socket(sock); // Sender OK */
+	send_socket(sock, "RCPT TO: "); /*Mail to*/
+	send_socket(sock, to_id);
+	send_socket(sock, "\r\n");
 	read_socket(sock); // Recipient OK*/
-	send_socket(filestr);
-	send_socket(".\r\n");
-	read_socket();
-	send_socket(QUIT); /* quit */
-	read_socket(); // log off */
+	send_socket(sock, DATA);// body to follow*/
+	send_socket(sock, "Subject: ");
+	send_socket(sock, sub);
+	read_socket(sock); // Recipient OK*/
+	send_socket(sock, filestr);
+	send_socket(sock, ".\r\n");
+	read_socket(sock);
+	send_socket(sock, QUIT); /* quit */
+	read_socket(sock); // log off */
 }
 
 /*=====MAIN=====*/
@@ -156,15 +155,8 @@ int main(int argc, char* argv[]){
 	}
 
 	/*=====Create Socket=====*/
-	sock = socket(AF_INET, SOCK_STREAM, 0);
-	if (sock==-1) {
-		perror("opening stream socket");
-		exit(EXIT_FAILURE);
-	}
-	else {
-        //printf("socket created\n");
-        printf("Trying %s", HELO);
-    }
+	int sock = createSocket();
+
 	/*=====Verify host=====*/
 	server.sin_family = AF_INET;
 	hp = gethostbyname(host_id);
@@ -188,7 +180,7 @@ int main(int argc, char* argv[]){
 
 	//printf("\n\n filestr : %s\n\n", filestr);
 
-	SendEmail(from_id, to_id, sub, filestr);
+	SendEmail(sock, from_id, to_id, sub, filestr);
 
 	//=====Close socket and finish=====*/
 	close(sock);
