@@ -80,27 +80,26 @@ void send_socket(int sock, char *s)	{
 }
 
 /*=====READ FILE======*/
-void readfile(int argc, char *argv[]) {
+char* readfile(char *argv[]) {
+	char filestr[STRING_MAX]="";
 	FILE *fichier = NULL;
-	char ch;
+	char* message=malloc(STRING_MAX);
 	fichier = fopen(argv[1], "r");
+
 	if(fichier != NULL) {
-		ch = fgetc(fichier);
-		int len = 0;
-		while (ch != EOF && ch != '\0') {
-			filestr[len]=ch;
-			len++;
-			ch = fgetc(fichier);
-			//printf("%c\n", ch);
+		while(fgets(filestr, STRING_MAX, fichier)){
+			strcat(message,filestr);
 		}
-        //puts(filestr);
 		fclose(fichier);
 	}
 	else {
 		perror("Erreur lors de l'ouverture du fichier.\n");
 		exit(EXIT_FAILURE);
 	}
-	strcat(filestr, "\r\n");
+	strcat(message, "\r\n");
+	//printf("%s",message);
+
+	return message;
 }
 
 
@@ -176,13 +175,13 @@ int main(int argc, char* argv[]){
     }
 
 	/*===== READ FILE ======*/
-	readfile(argc, argv);
+	char *message = readfile(argv);
 
-	//printf("\n\n filestr : %s\n\n", filestr);
-
-	SendEmail(sock, from_id, to_id, sub, filestr);
+	//printf("\n\n filestr : %s\n\n", message);
+	SendEmail(sock, from_id, to_id, sub, message);
 
 	//=====Close socket and finish=====*/
 	close(sock);
+	free(message);
 	exit(0);
 }
