@@ -43,11 +43,6 @@ Voilà votre mail est envoyé.
 #define STRING_MAX 10000
 
 
-// variable globale pour permettre un echange plus facile entre les fonctions
-// car on n'arrive pas a sortir un string de la fonction void readfile():
-char filestr[STRING_MAX]="";
-
-
 /*=====Create Socket=====*/
 int createSocket(){
 	int sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -144,7 +139,7 @@ int main(int argc, char* argv[]){
 
 	//TODO : changer le nom envoyeur, recepteur et sujet du mail ici :
 	char *from_id = "marko.smiljkovic@etu.unige.ch";
-	char *to_id = "marko.smiljkovic@etu.unige.ch";
+	char *to_id = "alexia.lienhard@etu.unige.ch";
 	char *sub = "Test pour le TP6\r\n";
 
 	// Controle de l'entree utilisateur :
