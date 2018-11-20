@@ -43,8 +43,8 @@ Voilà votre mail est envoyé.
 #define STRING_MAX 10000
 
 
-// variable globable pour permettre un echange plus facile entre les fonctions
-// car on n'arrive pas a sortir un string de void readfile():
+// variable globale pour permettre un echange plus facile entre les fonctions
+// car on n'arrive pas a sortir un string de la fonction void readfile():
 char filestr[STRING_MAX]="";
 
 
@@ -93,7 +93,7 @@ void readfile(int argc, char *argv[]) {
 			ch = fgetc(fichier);
 			//printf("%c\n", ch);
 		}
-        //puts(wkstr);
+        //puts(filestr);
 		fclose(fichier);
 	}
 	else {
