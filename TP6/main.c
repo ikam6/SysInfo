@@ -1,132 +1,161 @@
-#include<stdio.h>
+#include <stdio.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
+#include <unistd.h>
 #include <netdb.h>
-#include <errno.h>
+#include <netinet/in.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <time.h>
-#include <arpa/inet.h>
-#define SMTP_domain_name "smtp.unige.ch."
-#define domain ""
-/*
-inline void die(char *issue) {
-  perror(issue);
-  exit(EXIT_FAILURE);
-}
-inline void die(char *issue) {
-  perror(issue);
-  exit(EXIT_FAILURE);
-}
-void prepare_address( struct sockaddr_in *address, const char *host) {
-  size_t addrSize = sizeof( address );
-  memset(address, 0, addrSize);
-  address->sin_family = AF_INET;
-  inet_pton( AF_INET, (char*) address, &(address->sin_addr) );
-  address->sin_port = htons(25);
-}
 
-int makeSocket( const char *host, int port ) {
-  struct sockaddr_in address;
-  int sock = socket(PF_INET, SOCK_STREAM, 0);
-  if( sock < 0 ) {
-    die("Failed to create socket");
-  }
-  prepare_address( &address, host );
-  if( connect(sock, (struct sockaddr *) &address, sizeof(address)) < 0) {
-    die("Failed to connect with server");
-  }
-  return sock;
-}
-const char* Get_IP_Adress ( const char* target_domain){
-	const char* target_ip;
-	int i=0;
-	struct in_addr *host_address;
-	struct hostent *raw_list=gethostbyname(target_domain);
+//using namespace std;
 
-	for (i; raw_list->h_addr_list[i]!=0;i++){
-		host_address=raw_list->h_addr_list[i];
-		target_ip=inet_ntoa(host_address);
+#define HELO "HELO 192.168.1.1\r\n"
+#define DATA "DATA\r\n"
+#define QUIT "QUIT\r\n"
+
+#define h_addr h_addr_list[0]
+
+#define STRING_MAX 1000
+
+//FILE *fin;
+
+
+struct sockaddr_in server;
+struct hostent *hp;
+struct hostent *gethostbyname();
+
+int sock;
+char *host_id="smtp.unige.ch";
+char *from_id="marko.smiljkovic@etu.unige.ch";
+
+char *to_id="marko.smiljkovic@etu.unige.ch";
+char *sub="testmail\r\n";
+char wkstr[STRING_MAX]="yo\r\n";
+
+
+/*=====Create Socket=====*/
+int createSocket(){
+	sock = socket(AF_INET, SOCK_STREAM, 0);
+
+	if (sock==-1)	{
+		perror("opening stream socket");
+		exit(1);
 	}
-	return target_ip;
+	else
+	printf( "socket created\n");
+	return sock;
 }
-//connecte le client sur le serveur TODO changer de port si occupé
-int connectToServer(const char* server_address){
-	int socket_fd=socket (AF_INET, SOCK_STREAM,IPPROTO_IP);
-	struct sockaddr_in addr;
-	memset(&addr,0,sizeof(addr));
-	addr.sin_family=AF_INET;
-	addr.sin_port=htons(25);
-	if (inet_pton(AF_INET, Get_IP_Adress(server_address), addr.sin_addr)==1){
-		connect(socket_fd,&addr, sizeof(addr));
+
+//=====Read a string from the socket=====*/
+void read_socket() {
+	char buf[BUFSIZ+1];
+	int len;
+
+	len = read(sock,buf,BUFSIZ);
+	write(1,buf,len);
+	printf("Server:%s\n",buf);
+}
+
+/*=====Send a string to the socket=====*/
+void send_socket(char *s)	{
+	write(sock,s,strlen(s));
+	write(1,s,strlen(s));
+	//printf("Client:%s\n",s);
+}
+
+/*=====READ FILE======*/
+void readfile(int argc, char *argv[]) {
+	FILE *fichier = NULL;
+	fichier = fopen(argv[1], "r");
+
+	if(fichier != NULL) {
+		fgets(wkstr, STRING_MAX, fichier);
+		fclose(fichier);
 	}
-
-	return socket_fd;
-}
-
-int connect_server_wtd( WTD wtd ) {
-	int socket;
-	if( wtd.action & ACTION_CUSTOM_PORT ) {
-		socket = connectToServer( wtd.host, wtd.port );
-		if( socket < 0 ) { exit( EXIT_FAILURE ); }
-	} else {
-		// try default ports
-		if( 1
-			&& ((socket = connectToServer( wtd.host, 587 )) < 0)
-			&& ((socket = connectToServer( wtd.host, 25  )) < 0)
-			&& ((socket = connectToServer( wtd.host, 465 )) < 0)
-		) {
-			die("ERROR : could not open any default smtp ports\n");
-		}
+	else {
+		perror("Erreur lors de l'ouverture du fichier.\n");
+		exit(EXIT_FAILURE);
 	}
-	return socket;
+	strcat(wkstr, "\r\n");
 }
 
-int server_is_fine( int code ) {
-	if( 200 <= code && code <=355 ) {
-		return 1;
+
+/*==== SEND A MAIL =====*/
+void SendEmail(char* from_id, char* to_id, char* sub, char* wkstr ){
+	/*=====Write some data then read some =====*/
+	read_socket(); /* SMTP Server logon string */
+	send_socket(HELO); /* introduce ourselves */
+	read_socket(); /*Read reply */
+	send_socket("MAIL FROM: ");
+	send_socket(from_id);
+	send_socket("\r\n");
+	read_socket(); /* Sender OK */
+	send_socket("VRFY ");
+	send_socket(from_id);
+	send_socket("\r\n");
+	read_socket(); // Sender OK */
+	send_socket("RCPT TO: "); /*Mail to*/
+	send_socket(to_id);
+	send_socket("\r\n");
+	read_socket(); // Recipient OK*/
+	send_socket(DATA);// body to follow*/
+	send_socket("Subject: ");
+	send_socket(sub);
+	read_socket(sock); // Recipient OK*/
+	send_socket(wkstr);
+	send_socket(".\r\n");
+	read_socket();
+	send_socket(QUIT); /* quit */
+	read_socket(); // log off */
+
+	//=====Close socket and finish=====*/
+	close(sock);
+	exit(0);
+}
+
+/*=====MAIN=====*/
+int main(int argc, char* argv[]){
+	printf("%d\n", argc);
+	if (argc != 2){
+		printf("Rappel d'exécution : %s 'fichier.txt' \n", argv[0]);
+		exit(EXIT_FAILURE);
 	}
-	return 0;
+	/*=====Create Socket=====*/
+	sock = socket(AF_INET, SOCK_STREAM, 0);
+	if (sock==-1)
+	{
+		perror("opening stream socket");
+		exit(1);
+	}
+	else
+	printf("socket created\n");
+	/*=====Verify host=====*/
+	server.sin_family = AF_INET;
+	hp = gethostbyname(host_id);
+	if (hp==(struct hostent *) 0)
+	{
+		fprintf(stderr, "%s: unknown host\n", host_id);
+		exit(2);
+	}
+	/*=====Connect to port 25 on remote host=====*/
+	memcpy((char *) &server.sin_addr, (char *) hp->h_addr, hp->h_length);
+	server.sin_port=htons(25); /* SMTP PORT */
+	if (connect(sock, (struct sockaddr *) &server, sizeof server)==-1)
+	{
+		perror("connecting stream socket");
+		exit(1);
+	}
+	else
+	printf( "Connected\n");
+
+	/*===== READ FILE ======*/
+	readfile(argc, argv);
+
+	printf("\n\n wkstr : %s\n\n", wkstr);
+
+	SendEmail(from_id, to_id, sub, wkstr);
 }
-
-
-
-
-
-//prend le fichier en entrée et le copie dans un buffer
-char* getEMail(int argc, const char* argv[]){
-
-	FILE *f = fopen(argv[1], "rb");
-	fseek(f, 0, SEEK_END);
-	long fsize = ftell(f);
-	fseek(f, 0, SEEK_SET);
-
-	char *string = malloc(fsize + 1);
-	fread(string, fsize, 1, f);
-	fclose(f);
-
-	string[fsize] = 0;
-	return string;
-}
-
-int main(int argc, const char* argv[]){
-
-
-
-	char buffer [100];
-	int sended;
-	int receved;
-	char rcvd_buffer[4000];
-	int connected_fd=connectToServer(SMTP_domain_name);
-
-
-	strcpy(buffer, "EHLO");
-	strcat(buffer, domain);
-	strcat(buffer, "\r\n");
-	send(connected_fd,buffer, strlen(buffer),0);
-	sended= recv(connected_fd,rcvd_buffer+receved,sizeof(rcvd_buffer)-receved,0 );
-	receved+=sended;
-
-
-	return 0;
-}*/
