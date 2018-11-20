@@ -12,14 +12,11 @@
 #include <time.h>
 
 //using namespace std;
-
+//TODO chercher automatiquement l'adresse IP
 #define HELO "HELO 192.168.1.1\r\n"
 #define DATA "DATA\r\n"
 #define QUIT "QUIT\r\n"
 #define MAX 256
-
-/
-
 
 struct sockaddr_in server;
 struct hostent *hp;
@@ -30,6 +27,7 @@ char *host_id="smtp.unige.ch";
 
 const char sub[MAX];
 char wkstr[100]="hello how r u\r\n";
+
 
 void die(char *issue) {
   perror(issue);
@@ -45,14 +43,13 @@ void read_socket()
 
 	write(1,buf,len);
 	memset(buf,1, sizeof(buf));
-	//printf("Server:%s\n",buf);
+
 }
 
 /*=====Send a string to the socket=====*/
 void send_socket(char *s)	{
 	write(sock,s,strlen(s));
 	write(1,s,strlen(s));
-		//printf("Client:%s\n",s);
 		}
 
 void SendEmail(char* from_id, char* to_id, char* sub, char* wkstr ){
@@ -102,6 +99,15 @@ close(sock);
 exit(0);
 
 		}
+	void verifyHost(struct hostent* hp, char* host_id){
+		server.sin_family = AF_INET;
+		hp = gethostbyname(host_id);
+		if (hp==(struct hostent *) 0)
+		 {
+		 		fprintf(stderr, "%s: unknown host\n", host_id);
+					 exit(2);
+			   }
+			 }
 	/*=====MAIN=====*/
 
 int main(int argc, char* argv[]){
@@ -111,16 +117,18 @@ char* sub;
 
 /*=====Initialisation======*/
 	//TODO mettre a 5, et verifier le file.txt
-	//TODO mettre exemple 
+	//TODO mettre exemple
 	if (argc != 4) {
-		fprintf(stderr, "USAGE: %s <Email address FROM> <Email addres TO> <subject> <File.txt>\n", argv[0]);
+		fprintf(stderr, "USAGE: %s <Email address FROM> <Email addres TO>
+									<subject><File.txt>\n 
+		EXEMPLE: prenom.nom@unige.ch prenom.nom@etu.unige.ch SUJET File.txt\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
 
 	from_id = argv[1];
 	to_id = argv[2];
 	sub= argv[3];
-	//file = argv[3];
+	//file = argv[4];
 
 /*=====Create Socket=====*/
 sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -135,7 +143,8 @@ sock = socket(AF_INET, SOCK_STREAM, 0);
 
 	      printf ("socket created\n");
 
- /*=====Verify host=====*/
+
+} /*=====Verify host=====*/
 server.sin_family = AF_INET;
 hp = gethostbyname(host_id);
 if (hp==(struct hostent *) 0)
