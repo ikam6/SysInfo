@@ -27,7 +27,7 @@ int main (int argc, char *argv[]) {
 	}
 	else if (argc==3){
 		copy(argv[1], argv[2]);
-	list(argv[3]);
+
 	}
 	else if (argc > 3) {
 		for(int i=1;i<argc-1;i++){

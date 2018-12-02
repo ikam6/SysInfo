@@ -58,6 +58,7 @@ int sock;
 #define STRING_MAX 10000
 
 
+<<<<<<< HEAD
 // variable globale pour permettre un echange plus facile entre les fonctions
 // car on n'arrive pas a sortir un string de la fonction void readfile():
 char filestr[STRING_MAX]="";
@@ -66,6 +67,8 @@ char filestr[STRING_MAX]="";
 
 
 
+=======
+>>>>>>> 1f3a3982519c3cfca606322e475e6b5fb2266dfb
 /*=====Create Socket=====*/
 int createSocket(){
 	int sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -199,8 +202,8 @@ int main(int argc, char* argv[]){
 
 	//TODO : changer le nom envoyeur, recepteur et sujet du mail ici :
 	char *from_id = "marko.smiljkovic@etu.unige.ch";
-	char *to_id = "marko.smiljkovic@etu.unige.ch";
-	char *sub = "testmail\r\n";
+	char *to_id = "alexia.lienhard@etu.unige.ch";
+	char *sub = "Test pour le TP6\r\n";
 
 	// Controle de l'entree utilisateur :
 >>>>>>> 3519c6e82de374e6f493d19c00c34a43b084d77b
@@ -239,7 +242,6 @@ char*message = readfile(argc, argv);
 =======
 	/*===== READ FILE ======*/
 	char *message = readfile(argv);
-
 	//printf("\n\n filestr : %s\n\n", message);
 	SendEmail(sock, from_id, to_id, sub, message);
 
