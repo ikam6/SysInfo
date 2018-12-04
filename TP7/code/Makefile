@@ -3,14 +3,17 @@ CFLAGS=-Wall -g --pedantic -std=c99
 
 all: main
 
-syntaxAnalysis.o: syntaxAnalysis.c syntaxAnalysis.h
-		$(CC) $(CFLAGS) -c -o syntaxAnalysis.o syntaxAnalysis.c -lreadline
+# parsing.o: parsing.c parsing.h
+# 	$(CC) $(CFLAGS) -c -o parsing.o parsing.c
 
-main.o: main.c syntaxAnalysis.h
-	$(CC) $(CFLAGS) -c -o  main.o main.c -lreadline
+builtin.o: builtin.c builtin.h
+	$(CC) $(CFLAGS) -c -o builtin.o builtin.c
 
-main: main.o syntaxAnalysis.o
-	$(CC) $(CFLAGS) -o main main.o -lreadline
+main.o: main.c parsing.h builtin.h
+	$(CC) $(CFLAGS) -c -o  main.o main.c
+
+main: main.o builtin.o
+	$(CC) $(CFLAGS) -o main main.o builtin.o
 
 
 clean:
