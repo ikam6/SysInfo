@@ -1,19 +1,11 @@
 
 #include <stdio.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <netdb.h>
-#include <netinet/in.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <time.h>
-#include <errno.h>
-#include <readline/readline.h>
-#include <readline/history.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <signal.h>
@@ -22,25 +14,41 @@
 
 #define BUFFER_LEN 1024
 #define LASTCHAR	2
+pid_t BG_pid;
+pid_t FG_pid;
 
-int sigaction(int signum,const struct sigaction *act,struct sigaction *oldact);
-
-void *sigchldHandler(int signum, pid_t pid, void *notused)
+void sigchldHandler(int signum, siginfo_t *info, void *notused)
 {
 
-	  int status;
-		  waitpid(pid,&status,WUNTRACED);
-			wait(NULL);
-			printf(" ca mere %d\n", pid);
-		  printf("background job exited with the status :%d ", WEXITSTATUS(status));
-return 0;
+	   int status;
+		  if(BG_pid==info->si_pid){
+
+				waitpid(BG_pid,&status,WUNTRACED);
+		   printf("\nbackground job exited with the status :%d\n ", status);
 }
-void sigintHandler(){
+}
+void sigintHandler(int signum, siginfo_t *info, void *notused){
+
+	if(FG_pid!=0){
+
+		kill(FG_pid, SIGKILL);
+	}
+if(BG_pid!=0){
+
+	kill(BG_pid, SIGKILL);
+}
 
 }
 
-void sighupHandler(){
+void sighupHandler(int signum, siginfo_t *info, void *notused){
 
+	if(FG_pid!=0){
+		kill(FG_pid, SIGKILL);
+	}
+	if(BG_pid!=0){
+	kill(BG_pid, SIGKILL);
+}
+exit(EXIT_SUCCESS);
 }
 
 int main(){
@@ -78,34 +86,57 @@ while(1){
 				line[length - LASTCHAR] = '\0';
 			printf("-> this action will be executed in background\n");
 
-			int BG_pid= fork();              //fork child
-
+			 BG_pid= fork();              //fork child
 			if(BG_pid==0){               //Child
-				stdin=freopen("/dev/null","w",stdin);
-				execvp(progpath,argv);
+				stdin=freopen("/dev/null/","w",stdin); //redirction sur une autre entrée
+				char *token;                  //split command into separate strings
+				token = strtok(line," ");
+				int i=0;
+				while(token!=NULL){
+						argv[i]=token;
+						token = strtok(NULL," ");
+						i++;
+				}
+				argv[i]=NULL;                     //set last value to NULL for execvp
 
+				argc=i;                           //get arg count
+				for(i=0; i<argc; i++){
+						printf("%s\n", argv[i]);      //print command/argv
+				}
+				strcpy(progpath, path);           //copy /bin/ to file path
+				strcat(progpath, argv[0]);            //add program to path
+
+				for(i=0; i<strlen(progpath); i++){    //delete newline
+						if(progpath[i]=='\n'){
+								progpath[i]='\0';
+						}
+				}
+
+				if(execvp(progpath,argv)==-1){
+					perror(progpath);
+				}
 				fprintf(stderr, "Child process could not do execvp\n");
-				raise(SIGTERM);
+				//break
 				}
 				else{                    //Parent
-					signal(SIGQUIT,SIG_IGN);
-					signal(SIGTERM,SIG_IGN);
+					 signal(SIGQUIT,SIG_IGN);
+					 signal(SIGTERM,SIG_IGN);
+
 
 					struct sigaction chld_act;
-					chld_act.sa_flags=SA_SIGINFO|ERESTART;
+					chld_act.sa_flags=SA_SIGINFO|SA_RESTART;
 					chld_act.sa_sigaction=sigchldHandler;
 
-					// struct sigaction int_act;
-					// int_act.sa_flags=SA_SIGINFO|ERESTART;
-					// int_act.sa_sigaction=sigintHandler;//TODO a créer
+					struct sigaction int_act;
+					int_act.sa_flags=SA_SIGINFO|SA_RESTART;
+					int_act.sa_sigaction=sigintHandler;
 
 					struct sigaction hup_act;
-					hup_act.sa_flags=SA_SIGINFO|ERESTART;
-					hup_act.sa_sigaction=sighupHandler;//TODO a créer
+					hup_act.sa_flags=SA_SIGINFO|SA_RESTART;
+					hup_act.sa_sigaction=sighupHandler;
 
 					sigaction(SIGCHLD,&chld_act,NULL);
-
-					//sigaction(SIGINT,&int_act,NULL);
+					sigaction(SIGINT,&int_act,NULL);
 					sigaction(SIGHUP,&hup_act,NULL);
 
 					}
@@ -153,22 +184,19 @@ else{
 			printf(" coucou %s\n",cwd );
 }
 
-    int pid= fork();              //fork child
-    if(pid==0){               //Child
-        execvp(progpath,argv);
+    FG_pid= fork();              //fork child
+    if(FG_pid==0){               //Child
+
+				execvp(progpath,argv);
         fprintf(stderr, "Child process could not do execvp\n");
-				raise(SIGTERM);
+				exit(EXIT_FAILURE);
 			}
 			else{                    //Parent
         // wait(NULL);
 				int status;
-				pid_t w;
 
-				w=waitpid(pid,&status,WUNTRACED);
-				if(w==-1){
-					perror("waitpid");
-					exit(EXIT_FAILURE);
-				}
+
+				waitpid(FG_pid,&status,0);
 
         printf("Child exited with %d\n", WEXITSTATUS(status));
     }
