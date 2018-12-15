@@ -5,40 +5,143 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <sys/types.h>
 #include <sys/wait.h>
 #include <signal.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <semaphore.h>
+#include <errno.h>
+#include <time.h>
+#include <sys/mman.h>
+
+#define TEMPSCUISSON 4
+#define MEMORYNAME "/baric"
+#define NUM_INCREMENTS 10
+#define READY 0
+
+void fermeture(sem_t semaphore);
+void ouverture();
+
+
+typedef struct {
+    sem_t etagere;
+    int numberpizza;
+		char ready;
+} sharedMemory;
+
+void initialisation(sharedMemory *shm);
 
 int main(int argc, char const *argv[]) {
-	sem_t serverStart;
-	sem_t cookerPause;
-	sem_t etagere;
-int pizza=0;
-sem_init(&serverStart, 0, 1);
+time_t t;
+srand((unsigned) time(&t));
 
-sem_init(&cookerPause, 0, 1);
-sem_init(&etagere, 0, 3);
-while(pizza<10){
+int valeur;
+int fd;
+int i;
+sharedMemory *shm;
+
+
+ouverture();
+
+//création de la mémoire partagée
+if((fd=shm_open(MEMORYNAME, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR))==-1){
+		perror("shm_open");
+}
+
+		//Taille de la mémoire = indicator + number
+		if( ftruncate(fd, sizeof(sharedMemory)) == -1){
+			perror("ftruncate");
+		}
+
+
+		//File mapping (Les parametres doivent correspondres au mode d'ouverture de l'objet POSIX)
+		shm = (sharedMemory*) mmap(NULL, sizeof(sharedMemory), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+		if(shm == MAP_FAILED){
+			perror("mmap");
+		}
+
+			//initialisation du sémaphore
+				sem_init(&shm->etagere, 1, 3);
+
+			shm->ready = !READY;
+	    printf("Ok j'attends un processus qui peut m'aider...\n");
+	    while(!(shm->ready == READY));
+
+				shm->numberpizza=0;
+for(i=0;i<NUM_INCREMENTS;i++){
+sem_wait(&shm->etagere);
 //regarder si l'étagère est rempli si oui ->cooker pause
+sem_getvalue(&shm->etagere,&valeur);
+printf("\nil reste %d places sur l'etagere\n ",valeur);
+
+if(valeur==0){
+}
+
+
+sem_wait(&shm->etagere);
+
+
 
 //creer la pizza temps random
-printf("je mets la pizza no %d sur l'etagere", pizza);
+int r=rand()%TEMPSCUISSON + 1;
+printf("%d\n",r );
+sleep(r);
+printf(" PIZZAYOLO : j'ai mis la pizza no %d sur l'etagere\n", shm->numberpizza);
+shm->numberpizza++;
+printf("\t il reste %d place maintenant", valeur);
+sem_post(&shm->etagere);
 //ajouter la pizza à l'étagère
+//sem_post(&etagere);
 //servir pizza->serverStart
 
-
-
-
-
 }
-//controler que toute les pizzas soient servies== etagere =0 cooker en pause et serveur en pause
+//controler que toute les pizzas soient servies=> etagere =0 cooker en pause et serveur en pause
+//
+
+ // sem_close(serverStart);
+  fermeture(shm->etagere);
+
+// sem_close(cookerPause);
+// printf("j'ai fermé les semaphore");
+	printf("j'ai fini le travail\n" );
+	//Unmap
+			if(munmap(shm, sizeof(sharedMemory)) == -1)
+					perror("munmap");
+
+			//Detacher l'objet POSIX
+			shm_unlink(MEMORYNAME);
+
+return EXIT_SUCCESS;
+}
+
+void fermeture(sem_t semaphore){
+	sem_close(&semaphore);
+	sem_destroy(&semaphore);
+}
+
+void ouverture(){
+	printf("\n========================================================\n\n" );
+	printf("\t Bienvenue à la pizzeria\n\n" );
+	printf("========================================================\n\n" );
+}
+
+void initialisation(sharedMemory *shm){
+int fd;
+	//initialisation du sémaphore
+	sem_init(&shm->etagere, 0, 3);
+	//création de la mémoire partagée
+	if((fd=shm_open("/cp", O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR))==-1){
+			perror("shm_open");
+	}
 
 
-sem_close(&serverStart);
-sem_close(&etagere);
-sem_close(&cookerPause);
+	    //Taille de la mémoire = indicator + number
+	    if( ftruncate(fd, sizeof(sharedMemory)) == -1)
+	        perror("ftruncate");
 
-
-	return 0;
+	    //File mapping (Les parametres doivent correspondres au mode d'ouverture de l'objet POSIX)
+	    shm = (sharedMemory*) mmap(NULL, sizeof(sharedMemory), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	    if(shm == MAP_FAILED)
+	        perror("mmap");
 }
