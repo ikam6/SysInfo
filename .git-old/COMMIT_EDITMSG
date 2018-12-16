@@ -1,0 +1,14 @@
+en bonne voie, voir pourquoi le serveur ne parle pas
+# Veuillez saisir le message de validation pour vos modifications. Les lignes
+# commençant par '#' seront ignorées, et un message vide abandonne la validation.
+#
+# Sur la branche alexia
+# Modifications qui seront validées :
+#	modifié :         cooker
+#	modifié :         cooker.c
+#	modifié :         cooker.o
+#	modifié :         makefile
+#	modifié :         server
+#	modifié :         server.c
+#	modifié :         server.o
+#

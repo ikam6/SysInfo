@@ -1,0 +1,10 @@
+0000000000000000000000000000000000000000 4f282d0d3f0529d556dcfd7714b2f4aa1db3ba1f alexialid <alexia.lienhard@etu.unige.ch> 1542102315 +0100	branch: Created from HEAD
+4f282d0d3f0529d556dcfd7714b2f4aa1db3ba1f d46fd5072dc89af3343e4679c86a9af2b2e018f6 alexialid <alexia.lienhard@etu.unige.ch> 1542107000 +0100	commit: j'ai repris le server de l'exemple, ca marche mais faut l'adapter pour notre probleme
+d46fd5072dc89af3343e4679c86a9af2b2e018f6 514e8f6ba0ef90b7f4e1bcf3a51a35af98b57672 alexialid <alexia.lienhard@etu.unige.ch> 1542139736 +0100	commit: on recoit le bon nombres d'hexadécimal mais pas de gestion de s x n et N suivant la taille du buffer
+514e8f6ba0ef90b7f4e1bcf3a51a35af98b57672 0de66e485d2e91114ef09634023f7ec6813c9772 alexialid <alexia.lienhard@etu.unige.ch> 1542491870 +0100	commit: j'ai commencé mais sans savoir ce que je devais faire
+0de66e485d2e91114ef09634023f7ec6813c9772 af3ccdb7952232e52fddfae7db3b9b1515d9b430 alexialid <alexia.lienhard@etu.unige.ch> 1542704980 +0100	commit: la version essai marche plus ou moins, faut encore réussir à lire ( from_id to_id sub wkstr) + changer de port si occuper
+af3ccdb7952232e52fddfae7db3b9b1515d9b430 ecdcf9b157071304254035ff55b6a5d6dc69014a alexialid <alexia.lienhard@etu.unige.ch> 1542724167 +0100	commit: ca marche de ouf!! faut mettre au propre et faire le makefile et faire la lecture du fichier mail
+ecdcf9b157071304254035ff55b6a5d6dc69014a 112195b4b62ebe0400476183f3067a6958a9fd62 alexialid <alexia.lienhard@etu.unige.ch> 1542724333 +0100	pull: Merge made by the 'recursive' strategy.
+112195b4b62ebe0400476183f3067a6958a9fd62 96f07cd7d664bb3ac746a1a3296ddc67b2e302b3 alexialid <alexia.lienhard@etu.unige.ch> 1542727133 +0100	commit: ok
+96f07cd7d664bb3ac746a1a3296ddc67b2e302b3 af6e683f71336ba699ac4366ee8bffebf35329ce alexialid <alexia.lienhard@etu.unige.ch> 1542750480 +0100	commit (merge): Merge github.com:ikam6/SysInfo into Alexia
+af6e683f71336ba699ac4366ee8bffebf35329ce 97984f387091fb55101f434031d4e62b759dd6f0 alexialid <alexia.lienhard@etu.unige.ch> 1542751245 +0100	commit (merge): Merge github.com:ikam6/SysInfo into Alexia

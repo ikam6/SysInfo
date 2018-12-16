@@ -14,12 +14,16 @@
 #include <errno.h>
 #include <time.h>
 #include <sys/mman.h>
+
 #define NUM_INCREMENTS 10
 #define READY 0
-#define MEMORYNAME "/baric"
+#define MEMORYNAME "/barica"
+#define TEMPSCUISSON 4
 typedef struct {
     sem_t etagere;
-    int numberpizza;
+    int numberplace;
+		int numberpizza;
+		int numberlivre;
 		char ready;
 } sharedMemory;
 
@@ -42,22 +46,31 @@ int i;
 			if(shm == MAP_FAILED){
 				perror("SERVEUR mmap");
 			}
-			sem_init(&shm->etagere,1, 3);
+			sem_init(&shm->etagere,1, 1);
 		shm->ready = READY;
 		printf("SERVER is ready to work\n" );
-		while(1){
-			if(valeur <3){
-				int x=sem_post(&shm->etagere);
-				sem_getvalue(&shm->etagere, &valeur);
-				printf("SERVEUR valeur%d\n", valeur);
+		shm->numberlivre=1;
+	while(shm->numberpizza!=10 && shm->numberlivre!=10){
+			sem_wait(&shm->etagere);
+			//controler si il y a une pizza a servir
+			if(shm->numberplace==0){
+				printf("SERVEUR : Rien a servir\n" );
+				sem_post(&shm->etagere);
+				sleep(3);
+			}
+			else if(shm->numberplace!=0){
+				sem_post(&shm->etagere);
+				int r=rand()%TEMPSCUISSON + 1;
+				sleep(r);
+				sem_wait(&shm->etagere);
+				printf("SERVEUR: je sers la pizza %d\n",shm->numberlivre);
+				shm->numberplace--;
+				shm->numberlivre++;
+				sem_post(&shm->etagere);
+				sleep(2);
 			}
 
 		}
-
-
-
-
-
 
 //Unmap
     if(munmap(shm, sizeof(sharedMemory)) == -1)

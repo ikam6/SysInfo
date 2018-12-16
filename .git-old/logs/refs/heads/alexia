@@ -1,0 +1,9 @@
+0000000000000000000000000000000000000000 97984f387091fb55101f434031d4e62b759dd6f0 alexialid <alexia.lienhard@etu.unige.ch> 1543598671 +0100	branch: Created from HEAD
+97984f387091fb55101f434031d4e62b759dd6f0 0f04541256a630e79f1a6d1b6c132a6185d9f8ac alexialid <alexia.lienhard@etu.unige.ch> 1543738119 +0100	commit: la al
+0f04541256a630e79f1a6d1b6c132a6185d9f8ac 2f1c31dddc47ccf573fad9dfed4f4ec68921f496 alexialid <alexia.lienhard@etu.unige.ch> 1543746368 +0100	commit (merge): Merge github.com:ikam6/SysInfo into alexia
+2f1c31dddc47ccf573fad9dfed4f4ec68921f496 7d2304b2e1a14951fd6f888fc0d7187e03b29d09 alexialid <alexia.lienhard@etu.unige.ch> 1543934053 +0100	commit: trop de la balle
+7d2304b2e1a14951fd6f888fc0d7187e03b29d09 ae18f82b3d482d9608a7b0474956898a10a731cd alexialid <alexia.lienhard@etu.unige.ch> 1544526918 +0100	commit: tout marche jusqu'au point 3 le point 4 en cours de construction.A faire les module et les handler
+ae18f82b3d482d9608a7b0474956898a10a731cd b1fff6e3d705ebf840dead19d71f7e679ac3d0cb alexialid <alexia.lienhard@etu.unige.ch> 1544538530 +0100	commit: point 4 fini a verifier le cd et le (S)hell>> en background pas présent
+b1fff6e3d705ebf840dead19d71f7e679ac3d0cb 537c525bd71ba4402fc55aa3ef80c2d518db8817 alexialid <alexia.lienhard@etu.unige.ch> 1544540446 +0100	commit: création tp8
+537c525bd71ba4402fc55aa3ef80c2d518db8817 ad08daa44a07076ff10bff6ed193ddd1477ad454 alexialid <alexia.lienhard@etu.unige.ch> 1544872330 +0100	commit: début du TP8
+ad08daa44a07076ff10bff6ed193ddd1477ad454 fe8d17e72df8da6f4c7361b61602a4d0bc2c93b9 alexialid <alexia.lienhard@etu.unige.ch> 1544916357 +0100	commit: en bonne voie, voir pourquoi le serveur ne parle pas

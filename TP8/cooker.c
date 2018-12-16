@@ -16,7 +16,7 @@
 #include <sys/mman.h>
 
 #define TEMPSCUISSON 4
-#define MEMORYNAME "/baric"
+#define MEMORYNAME "/barica"
 #define NUM_INCREMENTS 10
 #define READY 0
 
@@ -26,7 +26,9 @@ void ouverture();
 
 typedef struct {
     sem_t etagere;
-    int numberpizza;
+    int numberplace;
+		int numberpizza;
+		int numberlivre;
 		char ready;
 } sharedMemory;
 
@@ -62,42 +64,41 @@ if((fd=shm_open(MEMORYNAME, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR))==-1){
 		}
 
 			//initialisation du sémaphore
-				sem_init(&shm->etagere, 1, 3);
+				sem_init(&shm->etagere, 1, 1);
 
 			shm->ready = !READY;
 	    printf("Ok j'attends un processus qui peut m'aider...\n");
 	    while(!(shm->ready == READY));
 
-				shm->numberpizza=0;
-for(i=0;i<NUM_INCREMENTS;i++){
-sem_wait(&shm->etagere);
+				shm->numberplace=0;
+				shm->numberpizza=1;
+while(shm->numberpizza!=11){
+	sem_wait(&shm->etagere);
 //regarder si l'étagère est rempli si oui ->cooker pause
-sem_getvalue(&shm->etagere,&valeur);
-printf("\nil reste %d places sur l'etagere\n ",valeur);
-
-if(valeur==0){
-}
-
-
-sem_wait(&shm->etagere);
-
-
-
+//printf("\nil y a %d places prises sur l'etagere\n ",shm->numberplace);
+	if(shm->numberplace>=3){
+		sem_post(&shm->etagere);
+		sleep(2);
+	}
 //creer la pizza temps random
-int r=rand()%TEMPSCUISSON + 1;
-printf("%d\n",r );
-sleep(r);
-printf(" PIZZAYOLO : j'ai mis la pizza no %d sur l'etagere\n", shm->numberpizza);
-shm->numberpizza++;
-printf("\t il reste %d place maintenant", valeur);
-sem_post(&shm->etagere);
-//ajouter la pizza à l'étagère
-//sem_post(&etagere);
-//servir pizza->serverStart
-
+	else{
+		sem_post(&shm->etagere);
+		int r=rand()%TEMPSCUISSON + 1;
+		//printf("%d\n",r );
+		sleep(r);
+		sem_wait(&shm->etagere);
+		printf(" PIZZAYOLO : j'ai mis la pizza no %d sur l'etagere\n", shm->numberpizza);
+		sem_post(&shm->etagere);
+		shm->numberplace++;
+		//printf("\t il reste %d place maintenant", 3-shm->numberplace);
+		shm->numberpizza++;
+		sleep(2);
+	}
 }
 //controler que toute les pizzas soient servies=> etagere =0 cooker en pause et serveur en pause
-//
+while(shm->numberlivre!=11){
+	sem_post(&shm->etagere);
+}
 
  // sem_close(serverStart);
   fermeture(shm->etagere);
@@ -111,6 +112,7 @@ sem_post(&shm->etagere);
 
 			//Detacher l'objet POSIX
 			shm_unlink(MEMORYNAME);
+			fermeture(shm->etagere);
 
 return EXIT_SUCCESS;
 }
@@ -129,7 +131,7 @@ void ouverture(){
 void initialisation(sharedMemory *shm){
 int fd;
 	//initialisation du sémaphore
-	sem_init(&shm->etagere, 0, 3);
+	sem_init(&shm->etagere, 1, 1);
 	//création de la mémoire partagée
 	if((fd=shm_open("/cp", O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR))==-1){
 			perror("shm_open");
