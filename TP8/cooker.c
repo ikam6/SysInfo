@@ -15,7 +15,7 @@
 #include <time.h>
 #include <sys/mman.h>
 
-#define TEMPSCUISSON 4
+#define TEMPSCUISSON 1
 #define MEMORYNAME "/barica"
 #define NUM_INCREMENTS 10
 #define READY 0
@@ -92,12 +92,13 @@ while(shm->numberpizza!=11){
 		shm->numberplace++;
 		//printf("\t il reste %d place maintenant", 3-shm->numberplace);
 		shm->numberpizza++;
-		sleep(2);
+		sleep(r);
 	}
 }
 //controler que toute les pizzas soient servies=> etagere =0 cooker en pause et serveur en pause
 while(shm->numberlivre!=11){
 	sem_post(&shm->etagere);
+	sleep(2);
 }
 
  // sem_close(serverStart);
@@ -105,15 +106,16 @@ while(shm->numberlivre!=11){
 
 // sem_close(cookerPause);
 // printf("j'ai fermé les semaphore");
-	printf("j'ai fini le travail\n" );
+	if(shm->ready==0){
+		printf("j'ai fini le travail\n" );
 	//Unmap
 			if(munmap(shm, sizeof(sharedMemory)) == -1)
 					perror("munmap");
-
+printf("COOKER : j'ai unmap\n" );
 			//Detacher l'objet POSIX
 			shm_unlink(MEMORYNAME);
 			fermeture(shm->etagere);
-
+}
 return EXIT_SUCCESS;
 }
 

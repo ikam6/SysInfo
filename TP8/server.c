@@ -18,7 +18,7 @@
 #define NUM_INCREMENTS 10
 #define READY 0
 #define MEMORYNAME "/barica"
-#define TEMPSCUISSON 4
+#define TEMPSCUISSON 1
 typedef struct {
     sem_t etagere;
     int numberplace;
@@ -50,15 +50,16 @@ int i;
 		shm->ready = READY;
 		printf("SERVER is ready to work\n" );
 		shm->numberlivre=1;
-	while(shm->numberpizza!=10 && shm->numberlivre!=10){
+	while(shm->numberlivre!=11){
 			sem_wait(&shm->etagere);
 			//controler si il y a une pizza a servir
 			if(shm->numberplace==0){
 				printf("SERVEUR : Rien a servir\n" );
 				sem_post(&shm->etagere);
-				sleep(3);
+				sleep(1);
+				printf("%d", shm->numberplace);
 			}
-			else if(shm->numberplace!=0){
+			 if(shm->numberplace!=0){
 				sem_post(&shm->etagere);
 				int r=rand()%TEMPSCUISSON + 1;
 				sleep(r);
@@ -68,17 +69,25 @@ int i;
 				shm->numberlivre++;
 				sem_post(&shm->etagere);
 				sleep(2);
+				printf("%d", shm->numberplace);
 			}
 
 		}
-
+		printf("je suis sorti connard\n" );
+		shm->ready=0;
+	if(shm->ready=0){
+printf("je suis la maggle");
+fermeture(shm->etagere);
 //Unmap
     if(munmap(shm, sizeof(sharedMemory)) == -1)
         perror("SERVEUR munmap");
-
+printf("j'ai Unmap\n" );
     //Detacher l'objet POSIX
     shm_unlink(MEMORYNAME);
 
+printf ("SERVEUR : j'ai fini de bosser");
+
+}
 return 0;
 }
 
