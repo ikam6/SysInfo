@@ -1,3 +1,10 @@
+# /*--------------------------------------------------------/
+#     Code fait par :
+#     Lienhard Alexia
+#     et
+#     Smiljkovic Marko
+# /--------------------------------------------------------*/
+
 CC=gcc
 CFLAGS=-Wall -g  -nostartfiles --pedantic -std=c99
 

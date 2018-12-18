@@ -1,3 +1,10 @@
+/*--------------------------------------------------------/
+    Code fait par :
+    Lienhard Alexia
+    et
+    Smiljkovic Marko
+/--------------------------------------------------------*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,13 +22,15 @@
 #include <time.h>
 #include <sys/mman.h>
 
+
+////////////////////////////////////
+// =========== INIT ============= //
+////////////////////////////////////
+
 #define TEMPSCUISSON 4
 #define MEMORYNAME "/barica"
 #define NUM_INCREMENTS 10
 #define READY 0
-
-void fermeture(sem_t semaphore);
-void ouverture();
 
 
 typedef struct {
@@ -32,15 +41,23 @@ typedef struct {
     char ready;
 } sharedMemory;
 
+
+void fermeture(sem_t semaphore);
+void ouverture();
 void initialisation(sharedMemory *shm);
 
+
+////////////////////////////////////
+// =========== MAIN ============= //
+////////////////////////////////////
+
+//_start et non main car besoin du point d'enter du programme pour l'adresse du symbole
 int _start(int argc, char const *argv[]) {
+
     time_t t;
     srand((unsigned) time(&t));
-
     int fd;
     sharedMemory *shm;
-
 
     ouverture();
 
@@ -71,15 +88,18 @@ int _start(int argc, char const *argv[]) {
     shm->numberplace=0;
     shm->numberpizza=0;
 
+    // boucle pour le service
     while(shm->numberpizza < NUM_INCREMENTS){
         sem_wait(&shm->etagere);
-        //regarder si l'étagère est rempli si oui ->cooker pause
         //printf("\nil y a %d places prises sur l'etagere\n ",shm->numberplace);
+
+        //regarder si l'étagère est rempli si oui ->cooker pause
         if(shm->numberplace >= 3){
+            printf(" PIZZAYOLO : j'attends le serveur\n");
             sem_post(&shm->etagere);
-            sleep(1);
+            sleep(3);
         }
-        //creer la pizza temps random
+        //sinon creer la pizza avec temps random
         else{
             sem_post(&shm->etagere);
             int r=rand()%TEMPSCUISSON + 1;
@@ -96,18 +116,23 @@ int _start(int argc, char const *argv[]) {
 
     printf("Voila, j'ai fini le travail\n\n" );
 
-    //controler que toute les pizzas soient servies=> etagere =0 cooker en pause et serveur en pause
-    while(shm->numberplace != 0){
+    // // controler que toute les pizzas soient servies
+    do {
         sem_post(&shm->etagere);
         printf(" INFO : il y a %d pizza sur l'étagere\n", shm->numberplace);
         sleep(3);
+    } while(shm->numberplace != 0);
+
+    if(shm->numberplace == 0){
+        printf(" INFO : il y a %d pizza sur l'étagere\n", shm->numberplace);
+        printf("Voila, tout est servi\n");
     }
+
 
 
     // int destroy = sem_destroy(&shm->etagere);
     if(sem_destroy(&shm->etagere) == -1)
     perror("COOKER sem_destroy error");
-
     // printf("HERE after destroy, %d\n", destroy);
 
     // int semClose = sem_close(&shm->etagere);
@@ -119,7 +144,6 @@ int _start(int argc, char const *argv[]) {
     // int munMap = munmap(shm, sizeof(sharedMemory));
     if(munmap(shm, sizeof(sharedMemory)) == -1)
     perror("COOKER munmap error");
-
     // printf("HERE after munmap, %d\n", munMap);
 
     // //Detacher l'objet POSIX
@@ -131,6 +155,10 @@ int _start(int argc, char const *argv[]) {
 	exit(EXIT_SUCCESS);
     return 0;
 }
+
+////////////////////////////////////
+// ========= FUNCTIONS ========== //
+////////////////////////////////////
 
 void fermeture(sem_t semaphore){
     sem_close(&semaphore);
