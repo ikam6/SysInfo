@@ -28,7 +28,11 @@ typedef struct {
     char ready;
 } sharedMemory;
 
-void fermeture(sem_t semaphore);
+
+void fermeture(sem_t semaphore){
+    sem_close(&semaphore);
+    sem_destroy(&semaphore);
+}
 
 int _start(int argc, char const *argv[]) {
     sleep(2);
@@ -48,48 +52,66 @@ int _start(int argc, char const *argv[]) {
         perror("SERVEUR mmap");
     }
 
-    sem_init(&shm->etagere, 1, 1);
+    if(sem_init(&shm->etagere, 1, 1) < 0){
+        perror("Semaphore error : ");
+        exit(0);
+    }
+
     shm->ready = READY;
-    printf("SERVER is ready to work\n" );
+
+    printf("SERVEUR is ready to work\n" );
     shm->numberlivre=1;
-    while(shm->numberpizza <= NUM_INCREMENTS && shm->numberlivre <= NUM_INCREMENTS){
+    while(shm->numberlivre <= NUM_INCREMENTS){
         sem_wait(&shm->etagere);
-        printf(" INFO : il y a %d pizza sur l'étagere\n", shm->numberplace);
+        // printf(" INFO : il y a %d pizza sur l'étagere\n", shm->numberplace);
         //controler si il y a une pizza a servir
 
         if(shm->numberplace==0){
             printf(" SERVEUR: Rien a servir\n" );
             sem_post(&shm->etagere);
-            sleep(1);
+            sleep(2);
         }
         else if(shm->numberplace!=0){
             sem_post(&shm->etagere);
             int r=rand()%TEMPSCUISSON + 1;
             sleep(r);
             sem_wait(&shm->etagere);
-            printf(" SERVEUR: je sers la pizza %d\n",shm->numberlivre);
             shm->numberplace--;
+            printf(" SERVEUR: je sers la pizza %d, il reste %d pizza sur l'etagere\n",shm->numberlivre, shm->numberplace);
             shm->numberlivre++;
             sem_post(&shm->etagere);
             //printf(" INFO : il y a %d pizza sur l'étagere\n", shm->numberplace);
-            sleep(r);
+            //sleep(r);
         }
-
     }
+    printf("Voila, tout est servi\n");
+    // printf(" ---> ERRORCHECK  : livre %s, place %s, pizza %s \n",  );
 
-    //Unmap
+    int destroy = sem_destroy(&shm->etagere);
+    if(destroy < 0)
+    perror("SERVEUR sem_destroy error");
+    printf("HERE after destroy, %d\n", destroy);
+
+    // int semClose = sem_close(&shm->etagere);
+    // if(semClose < 0)
+    // perror("SERVEUR sem_close error");
+    // printf("HERE after sem_close, %d\n", semClose);
+
+    // //Unmap
+    int munMap = munmap(shm, sizeof(sharedMemory));
     if(munmap(shm, sizeof(sharedMemory)) == -1)
-    perror("SERVEUR munmap");
+    perror("SERVEUR munmap error");
+
+    printf("HERE after munmap, %d\n", munMap);
 
     //Detacher l'objet POSIX
-    shm_unlink(MEMORYNAME);
+    int shmUnl = shm_unlink(MEMORYNAME);
+    if(shmUnl < 0)
+    perror("SERVEUR smh_unlink error");
 
-    fermeture(shm->etagere);
+    printf("HERE after shm_unlike, %d\n", shmUnl);
+
+
 
     return 0;
-}
-
-void fermeture(sem_t semaphore){
-    sem_close(&semaphore);
-    sem_destroy(&semaphore);
 }

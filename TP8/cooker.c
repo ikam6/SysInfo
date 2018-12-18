@@ -88,31 +88,44 @@ int _start(int argc, char const *argv[]) {
             shm->numberplace++;
             shm->numberpizza++;
             sem_wait(&shm->etagere);
-            printf(" PIZZAYOLO : j'ai mis la pizza no %d sur l'etagere\n", shm->numberpizza);
-            printf(" INFO : il y a %d pizza sur l'étagere\n", shm->numberplace);
+            printf(" PIZZAYOLO : j'ai mis la pizza no %d sur l'etagere, donc %d pizza sur l'etagere \n", shm->numberpizza, shm->numberplace);
             sem_post(&shm->etagere);
             // sleep(2);
         }
     }
+
+    printf("Voila, j'ai fini le travail\n" );
+
     //controler que toute les pizzas soient servies=> etagere =0 cooker en pause et serveur en pause
-    // while(shm->numberlivre <= NUM_INCREMENTS){
-    //     sem_post(&shm->etagere);
-    // }
-
-    // sem_close(serverStart);
-    // fermeture(shm->etagere);
-
-    // sem_close(cookerPause);
-    // printf("j'ai fermé les semaphore");
-    printf("j'ai fini le travail\n" );
-    //Unmap
-    if(munmap(shm, sizeof(sharedMemory)) == -1) {
-        perror("munmap");
+    while(shm->numberplace != 0){
+        sem_post(&shm->etagere);
+        printf(" INFO : il y a %d pizza sur l'étagere\n", shm->numberplace);
+        sleep(3);
     }
 
-    //Detacher l'objet POSIX
-    shm_unlink(MEMORYNAME);
-    fermeture(shm->etagere);
+
+    int destroy = sem_destroy(&shm->etagere);
+    if(destroy == -1)
+    perror("COOKER sem_destroy error");
+    printf("HERE after destroy, %d\n", destroy);
+
+    // int semClose = sem_close(&shm->etagere);
+    // if(semClose == -1)
+    // perror("COOKER sem_close error");
+    // printf("HERE after sem_close, %d\n", semClose);
+
+    // //Unmap
+    int munMap = munmap(shm, sizeof(sharedMemory));
+    if(munmap(shm, sizeof(sharedMemory)) == -1)
+    perror("COOKER munmap error");
+
+    printf("HERE after munmap, %d\n", munMap);
+
+    // //Detacher l'objet POSIX
+    // int shmUnl = shm_unlink(MEMORYNAME);
+    // if(shmUnl < 0)
+    // perror("COOKER smh_unlink error");
+    // printf(" HERE after shm_unlike, %d\n", shmUnl);
 
     return 0;
 }
