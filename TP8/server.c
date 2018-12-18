@@ -87,10 +87,11 @@ int _start(int argc, char const *argv[]) {
     printf("Voila, tout est servi\n");
     // printf(" ---> ERRORCHECK  : livre %s, place %s, pizza %s \n",  );
 
-    int destroy = sem_destroy(&shm->etagere);
-    if(destroy < 0)
+    //int destroy = sem_destroy(&shm->etagere);
+    if(sem_destroy(&shm->etagere) < 0)
     perror("SERVEUR sem_destroy error");
-    printf("HERE after destroy, %d\n", destroy);
+
+    //printf("HERE after destroy, %d\n", destroy);
 
     // int semClose = sem_close(&shm->etagere);
     // if(semClose < 0)
@@ -98,20 +99,20 @@ int _start(int argc, char const *argv[]) {
     // printf("HERE after sem_close, %d\n", semClose);
 
     // //Unmap
-    int munMap = munmap(shm, sizeof(sharedMemory));
+    // int munMap = munmap(shm, sizeof(sharedMemory));
     if(munmap(shm, sizeof(sharedMemory)) == -1)
     perror("SERVEUR munmap error");
 
-    printf("HERE after munmap, %d\n", munMap);
+    // printf("HERE after munmap, %d\n", munMap);
 
     //Detacher l'objet POSIX
-    int shmUnl = shm_unlink(MEMORYNAME);
-    if(shmUnl < 0)
+    // int shmUnl = shm_unlink(MEMORYNAME);
+    if(shm_unlink(MEMORYNAME) < 0)
     perror("SERVEUR smh_unlink error");
 
-    printf("HERE after shm_unlike, %d\n", shmUnl);
+    // printf("HERE after shm_unlike, %d\n", shmUnl);
 
 
-
+	exit(EXIT_SUCCESS);
     return 0;
 }

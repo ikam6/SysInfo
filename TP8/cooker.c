@@ -94,7 +94,7 @@ int _start(int argc, char const *argv[]) {
         }
     }
 
-    printf("Voila, j'ai fini le travail\n" );
+    printf("Voila, j'ai fini le travail\n\n" );
 
     //controler que toute les pizzas soient servies=> etagere =0 cooker en pause et serveur en pause
     while(shm->numberplace != 0){
@@ -104,10 +104,11 @@ int _start(int argc, char const *argv[]) {
     }
 
 
-    int destroy = sem_destroy(&shm->etagere);
-    if(destroy == -1)
+    // int destroy = sem_destroy(&shm->etagere);
+    if(sem_destroy(&shm->etagere) == -1)
     perror("COOKER sem_destroy error");
-    printf("HERE after destroy, %d\n", destroy);
+
+    // printf("HERE after destroy, %d\n", destroy);
 
     // int semClose = sem_close(&shm->etagere);
     // if(semClose == -1)
@@ -115,11 +116,11 @@ int _start(int argc, char const *argv[]) {
     // printf("HERE after sem_close, %d\n", semClose);
 
     // //Unmap
-    int munMap = munmap(shm, sizeof(sharedMemory));
+    // int munMap = munmap(shm, sizeof(sharedMemory));
     if(munmap(shm, sizeof(sharedMemory)) == -1)
     perror("COOKER munmap error");
 
-    printf("HERE after munmap, %d\n", munMap);
+    // printf("HERE after munmap, %d\n", munMap);
 
     // //Detacher l'objet POSIX
     // int shmUnl = shm_unlink(MEMORYNAME);
@@ -127,6 +128,7 @@ int _start(int argc, char const *argv[]) {
     // perror("COOKER smh_unlink error");
     // printf(" HERE after shm_unlike, %d\n", shmUnl);
 
+	exit(EXIT_SUCCESS);
     return 0;
 }
 
